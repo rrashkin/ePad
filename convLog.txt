@@ -1,0 +1,74 @@
+epad conversion log
+
+current epad runs in Python2
+rashkin@rrLaptop:~/BLPython/epad$ python epad
+rashkin@rrLaptop:~/BLPython/epad$
+
+rashkin@rrLaptop:~/BLPython/epad$ 2to3 -w epad
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: Refactored epad
+--- epad	(original)
++++ epad	(refactored)
+@@ -16,7 +16,7 @@
+ #    You should have received a copy of the GNU General Public License
+ #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-from __future__ import print_function  # May as well bite the bullet
++  # May as well bite the bullet
+
+ __author__ = "Jeff Hoogland"
+ __contributors__ = ["Jeff Hoogland", "Robert Wiley", "Kai Huuhko", "Scimmia22"]
+@@ -76,7 +76,7 @@
+ import errno
+ import sys
+ import os
+-import urllib
++import urllib.request, urllib.parse, urllib.error
+ import io
+ import json
+ from collections import Mapping
+@@ -521,7 +521,7 @@
+             for ourFile in start[0]:
+                 if ourFile[:7] == "file://":
+                     try:
+-                        ourFile = urllib.url2pathname(ourFile[7:])
++                        ourFile = urllib.request.url2pathname(ourFile[7:])
+                     except AttributeError:
+                         # Python3
+                         ourFile = urllib.request.url2pathname(ourFile[7:])
+@@ -1342,9 +1342,9 @@
+                 config.update({'font': 'Mono', 'font_size': 24})
+         """
+         if settings is not None:
+-            for setting, value in settings.items() if isinstance(settings, Mapping) else settings:
++            for setting, value in list(settings.items()) if isinstance(settings, Mapping) else settings:
+                 self.__safe_set(setting, value)
+-        for setting, value in kwargs.items():
++        for setting, value in list(kwargs.items()):
+             self.__safe_set(setting, value)
+         self.write()
+
+RefactoringTool: Files that were modified:
+RefactoringTool: epad
+
+rashkin@rrLaptop:~/BLPython/epad$ 2to3 -w -d epad
+RefactoringTool: Skipping optional fixer: buffer
+RefactoringTool: Skipping optional fixer: idioms
+RefactoringTool: Skipping optional fixer: set_literal
+RefactoringTool: Skipping optional fixer: ws_comma
+RefactoringTool: No files need to be modified.
+
+rashkin@rrLaptop:~/BLPython/epad$ python3 epad
+Traceback (most recent call last):
+  File "epad", line 1361, in <module>
+    GUI = Interface()
+  File "epad", line 266, in __init__
+    self.fileSelector.setMode("Open")
+AttributeError: 'FileSelector' object has no attribute 'setMode'
+>>>changed setMode to set_mode
+>>>changed addTab to add
+rashkin@rrLaptop:~/BLPython/epad$ python3 epad
+rashkin@rrLaptop:~/BLPython/epad$
