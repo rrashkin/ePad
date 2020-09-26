@@ -459,7 +459,8 @@ class Interface(object):
         else:
             self.unsavedWorkPopup()
 
-    def closePopup(self, bt, cnfrm_popup):
+    def close_popup(self):
+        ''' close popup window '''
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
 
@@ -492,7 +493,7 @@ class Interface(object):
         # Close without saving button
         no_btt = Button(self.main_window)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         no_btt.show()
         # Save the file and then close button
         sav_btt = Button(self.main_window)
@@ -801,19 +802,19 @@ class ePadEntry(Box):
         # Close without saving button
         no_btt = Button(self._parent.main_window)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         no_btt.callback_clicked_add(lambda o: self._parent.tabbs.deleteTab(self))
         no_btt.show()
         # cancel close request
         cancel_btt = Button(self._parent.main_window)
         cancel_btt.text = "Cancel"
-        cancel_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        cancel_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         cancel_btt.show()
         # Save the file and then close button
         sav_btt = Button(self._parent.main_window)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self._parent.save_file)
-        sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        sav_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         sav_btt.show()
 
         # add buttons to popup
@@ -822,7 +823,7 @@ class ePadEntry(Box):
         self.cnfrm_popup.part_content_set("button3", sav_btt)
         self.cnfrm_popup.show()
 
-    def closePopup(self, bt, cnfrm_popup):
+    def close_popup(self, bt, cnfrm_popup):
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
 
@@ -855,13 +856,13 @@ class ePadEntry(Box):
         # Close without saving button
         no_btt = Button(self._parent.main_window)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         no_btt.show()
         # Save the file and then close button
         sav_btt = Button(self._parent.main_window)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self.doSelected)
-        sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        sav_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         sav_btt.show()
 
         # add buttons to popup
