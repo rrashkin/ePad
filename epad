@@ -202,7 +202,7 @@ class Interface(object):
         self.main_window = StandardWindow("epad", "Untitled - ePad",
                                           size=(600, 400))
         self.main_window.callback_delete_request_add(self.close_checks)
-        self.main_window.elm_event_callback_add(self.eventsCb)
+        self.main_window.elm_event_callback_add(self.events_cb)
         #self.main_window.repeat_events_set(False)
 
         icon = Icon(self.main_window,
@@ -457,14 +457,15 @@ class Interface(object):
         if all_saved:
             self.close_app()
         else:
-            self.unsavedWorkPopup()
+            self.unsaved_work_popup()
 
     def close_popup(self):
         ''' close popup window '''
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
 
-    def unsavedWorkPopup(self):
+    def unsaved_work_popup(self):
+        ''' remind user of changes not yet saved '''
         if self.cnfrm_popup:
             return
 
@@ -472,23 +473,23 @@ class Interface(object):
                                  size_hint_weight=EXPAND_BOTH)
 
         # Add a table to hold dialog image and text to Popup
-        tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
-        self.cnfrm_popup.part_content_set("default", tb)
-        tb.show()
+        _tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup.part_content_set("default", _tb)
+        _tb.show()
 
         # Add dialog-error Image to table
         icon = Icon(self.cnfrm_popup, resizable=(True, True),
                     size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
-        tb.pack(icon, 0, 0, 1, 1)
+        _tb.pack(icon, 0, 0, 1, 1)
         icon.show()
         # Add dialog text to table
-        dialogLabel = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
-                            size_hint_weight=EXPAND_HORIZ,
-                            size_hint_align=FILL_BOTH)
-        dialogLabel.text = "You have unsaved work. Close anyways?<br><br>"
-        tb.pack(dialogLabel, 1, 0, 1, 1)
-        dialogLabel.show()
+        dialog_label = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
+                             size_hint_weight=EXPAND_HORIZ,
+                             size_hint_align=FILL_BOTH)
+        dialog_label.text = "You have unsaved work. Close anyways?<br><br>"
+        _tb.pack(dialog_label, 1, 0, 1, 1)
+        dialog_label.show()
 
         # Close without saving button
         no_btt = Button(self.main_window)
@@ -506,7 +507,9 @@ class Interface(object):
         self.cnfrm_popup.part_content_set("button3", sav_btt)
         self.cnfrm_popup.show()
 
-    def eventsCb(self, obj, src, event_type, event):
+    # pylint: disable=too-many-branches
+    def events_cb(self, src, event_type, event):
+        ''' callback function for interrupt events '''
 
         if not event_type == EVAS_CALLBACK_KEY_UP:
             return False
@@ -539,26 +542,27 @@ class Interface(object):
         return True
 
     def launch(self, start=[]):
+        ''' begin editting '''
         if start[0]:
-            for count, ourFile in enumerate(start[0]):
-                if os.path.dirname(ourFile) == '':
-                    start[0][count] = os.getcwd() + '/' + ourFile
+            for count, our_file in enumerate(start[0]):
+                if os.path.dirname(our_file) == '':
+                    start[0][count] = os.getcwd() + '/' + our_file
 
         if start and start[0]:
-            for ourFile in start[0]:
-                if ourFile[:7] == "file://":
+            for our_file in start[0]:
+                if our_file[:7] == "file://":
                     try:
-                        ourFile = urllib.request.url2pathname(ourFile[7:])
+                        our_file = urllib.request.url2pathname(our_file[7:])
                     except AttributeError:
                         # Python3
-                        ourFile = urllib.request.url2pathname(ourFile[7:])
-                if os.path.isdir(os.path.dirname(ourFile)):
-                    if os.path.isfile(ourFile):
-                        ##print(ourFile)
-                        self.add_file(ourFile)
+                        our_file = urllib.request.url2pathname(our_file[7:])
+                if os.path.isdir(os.path.dirname(our_file)):
+                    if os.path.isfile(our_file):
+                        ##print(our_file)
+                        self.add_file(our_file)
                 else:
                     error_msg = ("<b>'%s'</b> is an Invalid path."
-                                 "<br><br>Open failed !!!" % (ourFile))
+                                 "<br><br>Open failed !!!" % (our_file))
                     error_popup(self.main_window, error_msg)
         if start and start[1]:
             if os.path.isdir(start[1]):
@@ -844,14 +848,14 @@ class ePadEntry(Box):
         tb.pack(icon, 0, 0, 1, 1)
         icon.show()
         # Add dialog text to table
-        dialogLabel = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
-                            size_hint_weight=EXPAND_HORIZ,
-                            size_hint_align=FILL_BOTH)
+        dialog_label = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
+                             size_hint_weight=EXPAND_HORIZ,
+                             size_hint_align=FILL_BOTH)
         current_file = os.path.basename(file_path)
-        dialogLabel.text = "'%s' already exists. Overwrite?<br><br>" \
+        dialog_label.text = "'%s' already exists. Overwrite?<br><br>" \
                            % (current_file)
-        tb.pack(dialogLabel, 1, 0, 1, 1)
-        dialogLabel.show()
+        tb.pack(dialog_label, 1, 0, 1, 1)
+        dialog_label.show()
 
         # Close without saving button
         no_btt = Button(self._parent.main_window)
