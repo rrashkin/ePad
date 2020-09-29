@@ -200,7 +200,7 @@ class Interface(object):
         self.cnfrm_popup = None
         self.config = ePadConf()
 
-        self.main_window = StandardWindow("epad", "Untitled - ePad",
+        self.main_window = StandardWindow("epad", " Untitled - ePad",
                                           size=(600, 400))
         self.main_window.callback_delete_request_add(self.close_checks)
         self.main_window.elm_event_callback_add(self.events_cb)
@@ -301,10 +301,10 @@ class Interface(object):
             tab_name = file_path.split("/")[-1]
         else:
             tab_name = "Untitled"
-        entry_box.curChanged(entry_box.mainEn, entry_box.line_label)
+        entry_box.curChanged(entry_box.main_en, entry_box.line_label)
         entry_box.checkLineNumbers()
         self.tabbs.add(entry_box, tab_name)
-        entry_box.mainEn.focus_set(True)
+        entry_box.main_en.focus_set(True)
 
     def base_file(self):
         ''' This function gets called when all files are closed '''
@@ -320,7 +320,7 @@ class Interface(object):
         if self.tabbs.currentTab != btn.data["entry"]:
             self.setFile(btn.data["entry"], btn.text)
 
-    def new_file(self):
+    def new_file(self, obj=None):
         ''' open a new file '''
         if self.config["new_instance"]:
             print("Launching new instance")
@@ -330,9 +330,9 @@ class Interface(object):
             return
         self.add_file("Untitled")
 
-    def open_file(self):
+    def open_file(self, obj=None):
         ''' open a file for editing '''
-        self.file_slctr.setMode("Open")
+        self.file_slctr.set_mode("Open")
         self.file_lbl.text = "<b>Select a text file to open:</b>"
         if self.file_slctr.filepathEntry.text != self.last_dir:
             self.file_slctr.populateFiles(self.last_dir)
@@ -342,11 +342,11 @@ class Interface(object):
         ''' cancel file selection '''
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
-    def show_find(self):
+    def show_find(self, obj=None):
         ''' disply find dialog '''
         if not self.find_visible:
             self.main_box.pack_before(self.find_box, self.tabbs)
-            self.find_box.findEntry.text = self.tabbs.currentTab.mainEn.selection_get()
+            self.find_box.findEntry.text = self.tabbs.currentTab.main_en.selection_get()
             self.find_box.findEntry.focus_set(True)
             self.find_box.findEntry.cursor_end_set()
             self.find_box.show()
@@ -354,7 +354,7 @@ class Interface(object):
         else:
             self.hide_find()
 
-    def hide_find(self):
+    def hide_find(self, obj=None):
         ''' hide find dialog '''
         if self.find_visible:
             self.main_box.unpack(self.find_box)
@@ -369,13 +369,13 @@ class Interface(object):
             self.file_slctr.populateFiles(self.last_dir)
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
-    def save_file(self):
+    def save_file(self, obj=False):
         ''' save edited file in place '''
-        if self.tabbs.currentTab.mainEn.file_get()[0] is None or self.tabbs.currentTab.isNewFile:
+        if self.tabbs.currentTab.main_en.file_get()[0] is None or self.tabbs.currentTab.is_new_file:
             self.save_as()
         else:
             if not self.tabbs.currentTab.is_saved:
-                file_selected = self.tabbs.currentTab.mainEn.file_get()[0]
+                file_selected = self.tabbs.currentTab.main_en.file_get()[0]
                 # Detect save errors as entry.file_save currently returns no errors
                 #   even in the case where the file fails to save :(
                 try:
@@ -396,8 +396,8 @@ class Interface(object):
                 # if entry is empty and the file does not exists then
                 #   entry.file_save will destroy the file created about by the
                 #   open statement above for some odd reason ...
-                if not self.tabbs.currentTab.mainEn.is_empty:
-                    self.tabbs.currentTab.mainEn.file_save()
+                if not self.tabbs.currentTab.main_en.is_empty:
+                    self.tabbs.currentTab.main_en.file_save()
                 self.tabbs.currentTab.setDirty(False)
                 self.tabbs.currentTab.is_saved = True
 
@@ -443,7 +443,7 @@ class Interface(object):
         ''' display version information '''
         self.about.launch()
 
-    def close_app(self):
+    def close_app(self, obj=False):
         ''' close the epad app '''
         elementary.exit()
 
@@ -509,7 +509,7 @@ class Interface(object):
         self.cnfrm_popup.show()
 
     # pylint: disable=too-many-branches
-    def events_cb(self, src, event_type, event):
+    def events_cb(self, obj, src, event_type, event):
         ''' callback function for interrupt events '''
 
         if not event_type == EVAS_CALLBACK_KEY_UP:
@@ -622,21 +622,21 @@ class EPadEntry(Box):
 
         self.line_nums = self._parent.config['line_numbers']
 
-        self.mainEn = Entry(self._canvas, scrollable=False,
-                            line_wrap=self._parent.config['word_wrap'],
-                            autosave=self._parent.config['autosave'],
-                            size_hint_weight=(0.85, EVAS_HINT_EXPAND),
-                            size_hint_align=FILL_BOTH)
-        self.mainEn.callback_changed_user_add(self.textEdited)
-        self.mainEn.callback_clicked_add(reset_close_menu_count)
-        self.mainEn.callback_selection_cut_add(self.takeSnapShot)
-        self.mainEn.callback_selection_paste_add(self.takeSnapShot)
+        self.main_en = Entry(self._canvas, scrollable=False,
+                             line_wrap=self._parent.config['word_wrap'],
+                             autosave=self._parent.config['autosave'],
+                             size_hint_weight=(0.85, EVAS_HINT_EXPAND),
+                             size_hint_align=FILL_BOTH)
+        self.main_en.callback_changed_user_add(self.textEdited)
+        self.main_en.callback_clicked_add(reset_close_menu_count)
+        self.main_en.callback_selection_cut_add(self.takeSnapShot)
+        self.main_en.callback_selection_paste_add(self.takeSnapShot)
         # Don't let line_list steal focus
-        self.line_list.callback_clicked_add(lambda o: self.mainEn.focus_set(True))
-        self.mainEn.text_style_user_push(self.font_style)
+        self.line_list.callback_clicked_add(lambda o: self.main_en.focus_set(True))
+        self.main_en.text_style_user_push(self.font_style)
 
-        self.totalLines = 0
-        self.mainEn.show()
+        self.total_lines = 0
+        self.main_en.show()
         self.sep = Separator(self._canvas)
         self.sep.horizontal_set(False)
         self.sep.show()
@@ -645,7 +645,7 @@ class EPadEntry(Box):
             self.line_list.show()
             self.entry_box.pack_end(self.line_list)
             self.entry_box.pack_end(self.sep)
-        self.entry_box.pack_end(self.mainEn)
+        self.entry_box.pack_end(self.main_en)
 
         self.scr = Scroller(self._canvas,
                             size_hint_weight=EXPAND_BOTH,
@@ -662,13 +662,13 @@ class EPadEntry(Box):
                                     size_hint_weight=EXPAND_HORIZ,
                                     size_hint_align=FILL_BOTH)
 
-            self.mainEn.callback_cursor_changed_add(self.curChanged,
-                                                    self.line_label)
-            self.curChanged(self.mainEn, self.line_label)
+            self.main_en.callback_cursor_changed_add(self.curChanged,
+                                                     self.line_label)
+            self.curChanged(self.main_en, self.line_label)
             self.line_label.show()
             self.pack_end(self.line_label)
 
-        self.isNewFile = True
+        self.is_new_file = True
         self.is_saved = True
         self.doArchive = []
         self.doSpot = 0
@@ -680,8 +680,8 @@ class EPadEntry(Box):
             for i in range(self.doSpot+1, len(self.doArchive)):
                 self.doArchive.pop(self.doSpot+1)
 
-        curPos = self.mainEn.cursor_pos_get()
-        entryGet = self.mainEn.entry_get()
+        curPos = self.main_en.cursor_pos_get()
+        entryGet = self.main_en.entry_get()
 
         if self.doSpot == 0:
             self.saveSnapShot(curPos, entryGet)
@@ -701,33 +701,33 @@ class EPadEntry(Box):
         if self.doSpot > 0:
             # A check if this is the first time we are undoing that we store the latest data
             if self.doSpot == len(self.doArchive) - 1:
-                if self.doArchive[self.doSpot][1] != self.mainEn.entry_get():
+                if self.doArchive[self.doSpot][1] != self.main_en.entry_get():
                     self.takeSnapShot()
             self.doSpot -= 1
-            self.mainEn.entry_set(self.doArchive[self.doSpot][1])
-            self.mainEn.cursor_pos_set(self.doArchive[self.doSpot][0])
+            self.main_en.entry_set(self.doArchive[self.doSpot][1])
+            self.main_en.cursor_pos_set(self.doArchive[self.doSpot][0])
 
     def reDo(self):
         if self.doSpot + 1 < len(self.doArchive):
             self.doSpot += 1
-            self.mainEn.entry_set(self.doArchive[self.doSpot][1])
-            self.mainEn.cursor_pos_set(self.doArchive[self.doSpot][0])
+            self.main_en.entry_set(self.doArchive[self.doSpot][1])
+            self.main_en.cursor_pos_set(self.doArchive[self.doSpot][0])
 
     def checkLineNumbers(self):
-        if self.current_lines_shown < self.totalLines:
+        if self.current_lines_shown < self.total_lines:
             lines = ""
-            for i in range(self.current_lines_shown+1, self.totalLines+1):
+            for i in range(self.current_lines_shown+1, self.total_lines+1):
                 lines += "%s<br>"%(i)
             self.line_list.entry_append(lines)
-            self.current_lines_shown = self.totalLines
-        elif self.current_lines_shown > self.totalLines:
+            self.current_lines_shown = self.total_lines
+        elif self.current_lines_shown > self.total_lines:
             lines = "<i>"
 
-            for i in range(1, self.totalLines+1):
+            for i in range(1, self.total_lines+1):
                 lines = "%s%s<br>"%(lines, i)
 
             self.line_list.entry_set(lines)
-            '''for i in range(self.totalLines+1, self.current_lines_shown+1):
+            '''for i in range(self.total_lines+1, self.current_lines_shown+1):
                 ll = self.line_list
                 ll.cursor_end_set()
                 ll.cursor_prev()
@@ -737,7 +737,7 @@ class EPadEntry(Box):
                 ll.cursor_selection_end()
                 ll.selection_cut()'''
 
-            self.current_lines_shown = self.totalLines
+            self.current_lines_shown = self.total_lines
 
     def curChanged(self, entry, label):
         # get linear index into current text
@@ -745,7 +745,7 @@ class EPadEntry(Box):
         # Replace <br /> tag with single char
         #   to simplify (line, col) calculation
         tmp_text = markup_to_utf8(entry.entry_get())
-        self.totalLines = tmp_text.count("\n")+1
+        self.total_lines = tmp_text.count("\n")+1
         if self.line_nums:
             self.checkLineNumbers()
         text_slice = tmp_text[:index]
@@ -780,15 +780,15 @@ class EPadEntry(Box):
 
     def open_file(self, file_path):
         try:
-            self.mainEn.file_set(file_path, ELM_TEXT_FORMAT_PLAIN_UTF8)
+            self.main_en.file_set(file_path, ELM_TEXT_FORMAT_PLAIN_UTF8)
         except (RuntimeWarning, RuntimeError) as msg:
             pass
-        self.isNewFile = False
+        self.is_new_file = False
         #Reset undo/redo tracks when we open a file
         self.doArchive = []
         self.doSpot = 0
         self.takeSnapShot()
-        self.mainEn.focus_set(True)
+        self.main_en.focus_set(True)
 
     def close_checks(self, ourCallback=None):
         if not self.is_saved:
@@ -800,7 +800,7 @@ class EPadEntry(Box):
         self.cnfrm_popup = Popup(self._parent.main_window,
                                  size_hint_weight=EXPAND_BOTH)
         self.cnfrm_popup.part_text_set("title,text", "File Unsaved")
-        current_file = self.mainEn.file[0]
+        current_file = self.main_en.file[0]
         current_file = \
             os.path.basename(current_file) if current_file else "Untitled"
         self.cnfrm_popup.text = "Save changes to '%s'?" % (current_file)
@@ -900,26 +900,26 @@ class EPadEntry(Box):
                                  % (err.strerror, file_selected))
                     error_popup(self._parent.main_window, error_msg)
                 return
-            tmp_text = self.mainEn.entry_get()
+            tmp_text = self.main_en.entry_get()
             # fixme: Why save twice?
             newfile.write(tmp_text)
             newfile.close()
                 # Suppress error message when empty file is saved
             try:
-                self.mainEn.file_set(file_selected,
-                                     ELM_TEXT_FORMAT_PLAIN_UTF8)
+                self.main_en.file_set(file_selected,
+                                      ELM_TEXT_FORMAT_PLAIN_UTF8)
             except RuntimeError:
                 pass
                 # print("Empty file saved:{0}".format(file_selected))
-            self.mainEn.entry_set(tmp_text)
+            self.main_en.entry_set(tmp_text)
                 # if empty file entry.file_save destroys file :(
             if len(tmp_text):
-                self.mainEn.file_save()
+                self.main_en.file_save()
             self._parent.main_window.title_set(" %s - ePad" % os.path.basename(file_selected))
             self.data["button"].text = " %s" % os.path.basename(file_selected)
 
             self.is_saved = True
-            self.isNewFile = False
+            self.is_new_file = False
             self.setDirty(False)
 
 class EPadFindBox(Box):
@@ -1003,7 +1003,7 @@ class EPadFindBox(Box):
         self.pack_end(buttonBox)
 
     def replacePressed(self, obj):
-        tmp_text = markup_to_utf8(self._parent.tabbs.currentTab.mainEn.entry_get())
+        tmp_text = markup_to_utf8(self._parent.tabbs.currentTab.main_en.entry_get())
         if not self.caseCheck.state_get():
             search_string = self.findEntry.text.lower()
             locations = list(self.findAll(tmp_text.lower(), search_string))
@@ -1021,10 +1021,10 @@ class EPadFindBox(Box):
                     ourRe = re.compile(search_string)
                 tmp_text = ourRe.sub(replace_string, tmp_text).encode('utf-8').strip()
                 tmp_text = utf8_to_markup(tmp_text)
-                curPos = self._parent.tabbs.currentTab.mainEn.cursor_pos_get()
-                self._parent.tabbs.currentTab.mainEn.text_set(tmp_text)
+                curPos = self._parent.tabbs.currentTab.main_en.cursor_pos_get()
+                self._parent.tabbs.currentTab.main_en.text_set(tmp_text)
                 try:
-                    self._parent.tabbs.currentTab.mainEn.cursor_pos_set(curPos)
+                    self._parent.tabbs.currentTab.main_en.cursor_pos_set(curPos)
                 except:
                     pass
                     #print("Error: Can't set cursor position")
@@ -1042,10 +1042,10 @@ class EPadFindBox(Box):
     def findPressed(self, obj):
         if not self.caseCheck.state_get():
             search_string = self.findEntry.text.lower()
-            tmp_text = markup_to_utf8(self._parent.tabbs.currentTab.mainEn.entry_get()).lower()
+            tmp_text = markup_to_utf8(self._parent.tabbs.currentTab.main_en.entry_get()).lower()
         else:
             search_string = self.findEntry.text
-            tmp_text = markup_to_utf8(self._parent.tabbs.currentTab.mainEn.entry_get())
+            tmp_text = markup_to_utf8(self._parent.tabbs.currentTab.main_en.entry_get())
         search_length = len(search_string)
         if search_length:
             locations = list(self.findAll(tmp_text, search_string))
@@ -1059,7 +1059,7 @@ class EPadFindBox(Box):
                         self.current_find = locations[lastFind+1]
                     else:
                         self.current_find = locations[0]
-                self._parent.tabbs.currentTab.mainEn\
+                self._parent.tabbs.currentTab.main_en\
                 .select_region_set(self.current_find,
                                    self.current_find+search_length)
             else:
@@ -1191,15 +1191,15 @@ class ePadToolbar(Toolbar):
                 self.menu_item_ww.content.state = False
         # Change word wrap state of all open tabs
         for tab in self._parent.tabbs.tabs:
-            tab.mainEn.line_wrap_set(wordwrap)
+            tab.main_en.line_wrap_set(wordwrap)
             # for some reason have to reset font style
-            while tab.mainEn.text_style_user_peek():
-                tab.mainEn.text_style_user_pop()
-            tab.mainEn.text_style_user_push(self._parent.tabbs.currentTab.font_style)
+            while tab.main_en.text_style_user_peek():
+                tab.main_en.text_style_user_pop()
+            tab.main_en.text_style_user_push(self._parent.tabbs.currentTab.font_style)
         # Change line number state of all open tabs
         if linenum:
             for tab in self._parent.tabbs.tabs:
-                tab.entry_box.pack_before(tab.sep, tab.mainEn)
+                tab.entry_box.pack_before(tab.sep, tab.main_en)
                 tab.sep.show()
                 tab.entry_box.pack_before(tab.line_list, tab.sep)
                 tab.checkLineNumbers()
@@ -1225,7 +1225,7 @@ class ePadToolbar(Toolbar):
         reset_close_menu_count(None)
 
     def copyPress(self, obj, it):
-        self._parent.tabbs.currentTab.mainEn.selection_copy()
+        self._parent.tabbs.currentTab.main_en.selection_copy()
         reset_close_menu_count(None)
 
     def itemClicked(self, obj, item):
@@ -1235,15 +1235,15 @@ class ePadToolbar(Toolbar):
             CLOSE_MENU(item, item.text_get())
 
     def pastePress(self, obj, it):
-        self._parent.tabbs.currentTab.mainEn.selection_paste()
+        self._parent.tabbs.currentTab.main_en.selection_paste()
         reset_close_menu_count(None)
 
     def cutPress(self, obj, it):
-        self._parent.tabbs.currentTab.mainEn.selection_cut()
+        self._parent.tabbs.currentTab.main_en.selection_cut()
         reset_close_menu_count(None)
 
     def selectAllPress(self, obj, it):
-        self._parent.tabbs.currentTab.mainEn.select_all()
+        self._parent.tabbs.currentTab.main_en.select_all()
         reset_close_menu_count(None)
 
     def optionsNew(self, obj, it):
