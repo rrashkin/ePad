@@ -62,4 +62,10 @@ RefactoringTool: Skipping optional fixer: ws_comma
 RefactoringTool: No files need to be modified.
 
 rashkin@rrLaptop:~/BLPython/epad$ python3 epad
-Segmentation fault (core dumped)
+Segmentation fault (core dumped) [not repeatable]
+Next: add docstrings; check for long lines; 
+note: some of the long lines broke up lambdas...
+         in fact, had to correct one of those to satisfy pylint
+Corrected indentation and spaces and line-too-long pylint errors
+
+

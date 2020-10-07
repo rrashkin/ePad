@@ -1,3 +1,4 @@
+''' Simple text editor written in Elementary and Python '''
 #!/usr/bin/python
 # encoding: utf-8
 
@@ -89,8 +90,8 @@ except ImportError:
 import re
 
 from efl import ecore
-from efl.evas import EVAS_HINT_EXPAND, EVAS_HINT_FILL, \
-    EVAS_CALLBACK_KEY_UP, EVAS_EVENT_FLAG_ON_HOLD
+from efl.evas import EVAS_HINT_EXPAND, EVAS_HINT_FILL,\
+                     EVAS_CALLBACK_KEY_UP, EVAS_EVENT_FLAG_ON_HOLD
 from efl import elementary
 from efl.elementary.window import StandardWindow
 from efl.elementary.box import Box
@@ -101,12 +102,14 @@ from efl.elementary.notify import Notify, ELM_NOTIFY_ALIGN_FILL
 from efl.elementary.separator import Separator
 from efl.elementary.scroller import Scroller
 from efl.elementary.frame import Frame
-from efl.elementary.entry import Entry, ELM_TEXT_FORMAT_PLAIN_UTF8, \
-        markup_to_utf8, utf8_to_markup, ELM_WRAP_NONE, ELM_WRAP_MIXED
+from efl.elementary.entry import Entry, ELM_TEXT_FORMAT_PLAIN_UTF8,\
+                                 markup_to_utf8, utf8_to_markup,\
+                                 ELM_WRAP_NONE, ELM_WRAP_MIXED
 from efl.elementary.popup import Popup
 from efl.elementary.toolbar import Toolbar, ELM_OBJECT_SELECT_MODE_DEFAULT
-from efl.elementary.flip import Flip, ELM_FLIP_ROTATE_XZ_CENTER_AXIS, \
-        ELM_FLIP_ROTATE_YZ_CENTER_AXIS, ELM_FLIP_INTERACTION_ROTATE
+from efl.elementary.flip import Flip, ELM_FLIP_ROTATE_XZ_CENTER_AXIS,\
+                                ELM_FLIP_ROTATE_YZ_CENTER_AXIS,\
+                                ELM_FLIP_INTERACTION_ROTATE
 from efl.elementary.table import Table
 from efl.elementary.check import Check
 from efl.elementary.naviframe import Naviframe
@@ -137,6 +140,7 @@ def print_err(*args, **kwargs):
     print('[ePad]:', *args, file=sys.stderr, **kwargs)
 
 def errorPopup(window, errorMsg):
+    ''' create a popup alert '''
     errorPopup = Popup(window, size_hint_weight=EXPAND_BOTH)
     errorPopup.callback_block_clicked_add(lambda obj: errorPopup.delete())
 
@@ -146,8 +150,8 @@ def errorPopup(window, errorMsg):
     tb.show()
 
     # Add dialog-error Image to table
-    icon = Icon(errorPopup, resizable=(True, True), 
-                 size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
+    icon = Icon(errorPopup, resizable=(True, True),
+                size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
     icon.standard_set('dialog-warning')
     tb.pack(icon, 0, 0, 1, 1)
     icon.show()
@@ -172,6 +176,7 @@ def errorPopup(window, errorMsg):
 
 
 def closeMenu(obj, label):
+    ''' set menu attributes for close '''
     if not hasattr(closeMenu, 'count'):
         closeMenu.count = 0
     if not hasattr(closeMenu, 'name'):
@@ -185,11 +190,13 @@ def closeMenu(obj, label):
 
 
 def resetCloseMenuCount(obj):
-        global closeMenu
-        if hasattr(closeMenu, 'count'):
-            closeMenu.count = 0
+    ''' reset count for close menu '''
+    global closeMenu
+    if hasattr(closeMenu, 'count'):
+        closeMenu.count = 0
 
 class Interface(object):
+    ''' container class for editor interface '''
     def __init__(self):
         self.confirmPopup = None
         self.config = ePadConf()
@@ -222,9 +229,11 @@ class Interface(object):
         if os.geteuid() == 0:
             # print_err("Caution: Root User")
             if self.config["notify_root"]:
-                notifyBox = Box(self.mainWindow, horizontal=True,size_hint_weight=EXPAND_HORIZ,
-                                    size_hint_align=FILL_BOTH)
-                notifyLabel = Label(self.mainWindow, style="default/center", size_hint_weight=EXPAND_HORIZ,
+                notifyBox = Box(self.mainWindow, horizontal=True,
+                                size_hint_weight=EXPAND_HORIZ,
+                                size_hint_align=FILL_BOTH)
+                notifyLabel = Label(self.mainWindow, style="default/center",
+                                    size_hint_weight=EXPAND_HORIZ,
                                     size_hint_align=FILL_BOTH)
                 notifyLabel.text = "<b><i>Root User</i></b>"
                 notifyBox.pack_end(notifyLabel)
@@ -236,7 +245,7 @@ class Interface(object):
         self.findVisible = False
 
         self.tabbs = TabbedBox(self.mainWindow, size_hint_weight=EXPAND_BOTH,
-                           size_hint_align=FILL_BOTH)
+                               size_hint_align=FILL_BOTH)
         self.tabbs.closeCallback = self.closeFile
         self.tabbs.emptyCallback = self.baseFile
         self.tabbs.tabChangedCallback = self.tabChanged
@@ -279,10 +288,12 @@ class Interface(object):
         self.flip.show()
 
     def tabChanged(self, tabbs, widget):
+        ''' handler for when focus changes tabs '''
         self.mainWindow.title = widget.data["button"].text
         self.mainTb.savebtn.disabled = not widget.dirty
 
     def addFile(self, filePath):
+        ''' add file to new tab '''
         entryBox = ePadEntry(self, self.tabbs)
         entryBox.show()
 
@@ -297,24 +308,30 @@ class Interface(object):
         entryBox.mainEn.focus_set(True)
 
     def baseFile(self, tabbs):
-        #This function gets called when all files are closed
+        '''This function gets called when all files are closed '''
         self.addFile("Untitled")
 
     def closeFile(self, tabbs, widget):
+        ''' initiate checks to close file '''
         widget.closeChecks()
 
     def showFile(self, btn):
+        ''' ??? display file ??? '''
         if self.tabbs.current != btn.data["entry"]:
             self.setFile(btn.data["entry"], btn.text)
 
     def newFile(self, obj=None, ignoreSave=False):
+        ''' blank tab for new file '''
         if self.config["new_instance"]:
             print("Launching new instance")
-            ecore.Exe('epad', ecore.ECORE_EXE_PIPE_READ|ecore.ECORE_EXE_PIPE_ERROR|ecore.ECORE_EXE_PIPE_WRITE)
+            ecore.Exe('epad', ecore.ECORE_EXE_PIPE_READ|
+                      ecore.ECORE_EXE_PIPE_ERROR|
+                      ecore.ECORE_EXE_PIPE_WRITE)
             return
         self.addFile("Untitled")
 
     def openFile(self, obj=None, ignoreSave=False):
+        ''' open a new/different file '''
         self.fileSelector.set_mode("Open")
         self.fileLabel.text = "<b>Select a text file to open:</b>"
         if self.fileSelector.filepath_en.text != self.lastDir:
@@ -322,9 +339,11 @@ class Interface(object):
         self.flip.go(ELM_FLIP_ROTATE_YZ_CENTER_AXIS)
 
     def fileSelCancelPressed(self, fs):
+        ''' cancel file selection '''
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
     def showFind(self, obj=None):
+        ''' display find dialog '''
         if not self.findVisible:
             self.mainBox.pack_before(self.findBox, self.tabbs)
             self.findBox.findEntry.text = self.tabbs.current.mainEn.selection_get()
@@ -336,12 +355,14 @@ class Interface(object):
             self.hideFind()
 
     def hideFind(self, obj=None):
+        ''' hide find dialog '''
         if self.findVisible:
             self.mainBox.unpack(self.findBox)
             self.findBox.hide()
             self.findVisible = False
 
     def saveAs(self):
+        ''' handler for save file as new path/name '''
         self.fileSelector.set_mode("Save")
         self.fileLabel.text = "<b>Save new file to where:</b>"
         if self.fileSelector.filepath_en.text != self.lastDir:
@@ -349,6 +370,7 @@ class Interface(object):
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
     def saveFile(self, obj=False):
+        ''' handler for save file '''
         if self.tabbs.current.mainEn.file_get()[0] is None or self.tabbs.current.isNewFile:
             self.saveAs()
         else:
@@ -380,6 +402,7 @@ class Interface(object):
                 self.tabbs.current.isSaved = True
 
     def fileSelected(self, fs, file_selected, onStartup=False):
+        ''' function identifies selected file '''
         if not onStartup:
             self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
             # Markup can end up in file names because file_selector name_entry
@@ -413,15 +436,19 @@ class Interface(object):
                 self.addFile(file_selected)
 
     def updateLastDir(self, path):
+        ''' actualize current path '''
         self.lastDir = path
 
     def showAbout(self):
+        ''' display version info '''
         self.about.launch()
 
     def closeApp(self, obj=False, trash=False):
+        ''' close application '''
         elementary.exit()
 
     def closeChecks(self, obj=False):
+        ''' check status is ok to close '''
         allSaved = True
 
         for en in self.tabbs.tabs:
@@ -434,10 +461,12 @@ class Interface(object):
             self.unsavedWorkPopup()
 
     def closePopup(self, bt, confirmPopup):
+        ''' close are-you-sure? popup '''
         self.confirmPopup.delete()
         self.confirmPopup = None
 
     def unsavedWorkPopup(self):
+        ''' warn unsaved changes '''
         if self.confirmPopup:
             return
 
@@ -450,7 +479,7 @@ class Interface(object):
         tb.show()
 
         # Add dialog-error Image to table
-        icon = Icon(self.confirmPopup, resizable=(True, True), 
+        icon = Icon(self.confirmPopup, resizable=(True, True),
                     size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
         tb.pack(icon, 0, 0, 1, 1)
@@ -480,7 +509,7 @@ class Interface(object):
         self.confirmPopup.show()
 
     def eventsCb(self, obj, src, event_type, event):
-
+        ''' callback to process button press events '''
         if not event_type == EVAS_CALLBACK_KEY_UP:
             return False
 
@@ -512,6 +541,7 @@ class Interface(object):
         return True
 
     def launch(self, start=[]):
+        ''' launch main application window '''
         if start[0]:
             for count, ourFile in enumerate(start[0]):
                 if os.path.dirname(ourFile) == '':
@@ -545,7 +575,7 @@ class Interface(object):
         self.mainWindow.show()
 
 class ePadEntry(Box):
-
+    ''' tile text entry box in main window '''
     default_font_size = 14
 
     def __init__(self, parent, canvas):
@@ -565,22 +595,26 @@ class ePadEntry(Box):
         font_width = self._config['font_width']
         font_size = self._config['font_size']
 
-        self.font_style = "DEFAULT='font={0} font_style={1} font_weight={2} font_width={3} font_size={4}'".format(font, font_style, font_weight, font_width, str(font_size))
+        self.font_style = "DEFAULT='font={0} font_style={1} font_weight={2}\
+                          font_width={3} font_size={4}'".format(font, font_style,
+                                                                font_weight, font_width,
+                                                                str(font_size))
 
         self.entryBox = Box(self._canvas,
-                           size_hint_weight=EXPAND_BOTH,
-                           size_hint_align=FILL_BOTH)
+                            size_hint_weight=EXPAND_BOTH,
+                            size_hint_align=FILL_BOTH)
         self.entryBox.horizontal = True
         self.entryBox.show()
 
         # Initialize Text entry box and line label
         self.lineList = Entry(self._canvas,
-                           scrollable=False, editable=False,
-                           size_hint_weight=(0.0, EVAS_HINT_EXPAND),
-                           size_hint_align=(0.0, 0.0),
-                           line_wrap=ELM_WRAP_NONE)
+                              scrollable=False, editable=False,
+                              size_hint_weight=(0.0, EVAS_HINT_EXPAND),
+                              size_hint_align=(0.0, 0.0),
+                              line_wrap=ELM_WRAP_NONE)
 
-        self.lineList.text_style_user_push("DEFAULT='font_size={0}'".format(self._config['font_size']))
+        self.lineList.text_style_user_push("DEFAULT='font_size={0}'".
+                                           format(self._config['font_size']))
         self.currentLinesShown = 1
         self.lineList.text_set("<i>1<br>")
 
@@ -612,8 +646,8 @@ class ePadEntry(Box):
         self.entryBox.pack_end(self.mainEn)
 
         self.scr = Scroller(self._canvas,
-                           size_hint_weight=EXPAND_BOTH,
-                           size_hint_align=FILL_BOTH)
+                            size_hint_weight=EXPAND_BOTH,
+                            size_hint_align=FILL_BOTH)
         self.scr.content = self.entryBox
         self.scr.show()
 
@@ -640,6 +674,7 @@ class ePadEntry(Box):
         self.setDirty(False)
 
     def takeSnapShot(self, obj=None):
+        ''' remember current state '''
         if self.doSpot != len(self.doArchive)-1:
             for i in range(self.doSpot+1, len(self.doArchive)):
                 self.doArchive.pop(self.doSpot+1)
@@ -653,6 +688,7 @@ class ePadEntry(Box):
             self.saveSnapShot(curPos, entryGet)
 
     def saveSnapShot(self, curPos, entryGet):
+        ''' save current state '''
         self.doArchive.append([curPos, entryGet])
 
         if len(self.doArchive) > 30:
@@ -662,6 +698,7 @@ class ePadEntry(Box):
 
 
     def unDo(self):
+        ''' back out edit '''
         if self.doSpot > 0:
             # A check if this is the first time we are undoing that we store the latest data
             if self.doSpot == len(self.doArchive) - 1:
@@ -672,12 +709,14 @@ class ePadEntry(Box):
             self.mainEn.cursor_pos_set(self.doArchive[self.doSpot][0])
 
     def reDo(self):
+        ''' put edit back in '''
         if self.doSpot + 1 < len(self.doArchive):
             self.doSpot += 1
             self.mainEn.entry_set(self.doArchive[self.doSpot][1])
             self.mainEn.cursor_pos_set(self.doArchive[self.doSpot][0])
 
     def checkLineNumbers(self):
+        ''' adjust line numbers '''
         if self.currentLinesShown < self.totalLines:
             lines = ""
             for i in range(self.currentLinesShown+1, self.totalLines+1):
@@ -704,6 +743,7 @@ class ePadEntry(Box):
             self.currentLinesShown = self.totalLines
 
     def curChanged(self, entry, label):
+        ''' log current changes '''
         # get linear index into current text
         index = entry.cursor_pos_get()
         # Replace <br /> tag with single char
@@ -720,6 +760,7 @@ class ePadEntry(Box):
         label.text = "Ln {0} Col {1} ".format(line_n, col)
 
     def setDirty(self, dirty):
+        ''' set unsaved changes condition '''
         if dirty:
             self.dirty = True
             self._parent.mainWindow.title = "*" + self._parent.mainWindow.title
@@ -738,11 +779,13 @@ class ePadEntry(Box):
             self._parent.mainTb.savebtn.disabled = True
 
     def textEdited(self, obj=None):
+        ''' keep track if changes saved or not '''
         if not self.dirty:
             self.setDirty(True)
         self.isSaved = False
 
     def openFile(self, filePath):
+        ''' open existing file '''
         try:
             self.mainEn.file_set(filePath, ELM_TEXT_FORMAT_PLAIN_UTF8)
         except (RuntimeWarning, RuntimeError) as msg:
@@ -755,12 +798,14 @@ class ePadEntry(Box):
         self.mainEn.focus_set(True)
 
     def closeChecks(self, ourCallback=None):
+        ''' close file checklist '''
         if not self.isSaved:
             self.confirmSave()
         else:
             self._parent.tabbs.deleteTab(self)
 
     def confirmSave(self):
+        ''' double-check save '''
         self.confirmPopup = Popup(self._parent.mainWindow,
                                   size_hint_weight=EXPAND_BOTH)
         self.confirmPopup.part_text_set("title,text", "File Unsaved")
@@ -793,10 +838,12 @@ class ePadEntry(Box):
         self.confirmPopup.show()
 
     def closePopup(self, bt, confirmPopup):
+        ''' close popup '''
         self.confirmPopup.delete()
         self.confirmPopup = None
 
     def fileExists(self, filePath):
+        ''' handler for when saveas filename exists '''
         self.confirmPopup = Popup(self._parent.mainWindow,
                                   size_hint_weight=EXPAND_BOTH)
 
@@ -806,8 +853,9 @@ class ePadEntry(Box):
         tb.show()
 
         # Add dialog-error Image to table
-        icon = Icon(self.confirmPopup, resizable=(True, True), 
-                 size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
+        icon = Icon(self.confirmPopup, resizable=(True, True),
+                    size_hint_weight=EXPAND_BOTH,
+                    size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
         tb.pack(icon, 0, 0, 1, 1)
         icon.show()
@@ -839,6 +887,7 @@ class ePadEntry(Box):
         self.confirmPopup.show()
 
     def doSelected(self, obj):
+        ''' deal with selected file '''
         # Something I should avoid but here I prefer a polymorphic function
         if isinstance(obj, Button):
             file_selected = self._parent.fileSelector.selected_get()
@@ -854,13 +903,13 @@ class ePadEntry(Box):
                 #                                    file_selected))
                 if err.errno == errno.EACCES:
                     errorMsg = ("Permision denied: <b>'%s'</b>."
-                                    "<br><br>Operation failed !!!</br>"
-                                    % (file_selected))
+                                "<br><br>Operation failed !!!</br>"
+                                % (file_selected))
                     errorPopup(self._parent.mainWindow, errorMsg)
                 else:
                     errorMsg = ("ERROR: %s: '%s'"
-                                    "<br><br>Operation failed !!!</br>"
-                                    % (err.strerror, file_selected))
+                                "<br><br>Operation failed !!!</br>"
+                                % (err.strerror, file_selected))
                     errorPopup(self._parent.mainWindow, errorMsg)
                 return
             tmp_text = self.mainEn.entry_get()
@@ -870,7 +919,7 @@ class ePadEntry(Box):
                 # Suppress error message when empty file is saved
             try:
                 self.mainEn.file_set(file_selected,
-                                         ELM_TEXT_FORMAT_PLAIN_UTF8)
+                                     ELM_TEXT_FORMAT_PLAIN_UTF8)
             except RuntimeError:
                 pass
                 #print("Empty file saved:{0}".format(file_selected))
@@ -886,6 +935,7 @@ class ePadEntry(Box):
             self.setDirty(False)
 
 class ePadFindBox(Box):
+    ''' instantiate find text dialog '''
     def __init__(self, parent, canvas):
         Box.__init__(self, canvas)
         self._parent = parent
@@ -905,7 +955,8 @@ class ePadFindBox(Box):
         findBox.text = "Find Text:"
         findBox.show()
 
-        self.findEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        self.findEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                               size_hint_align=FILL_HORIZ)
         self.findEntry.single_line_set(True)
         self.findEntry.scrollable_set(True)
         self.findEntry.callback_activated_add(self.findPressed)
@@ -917,7 +968,8 @@ class ePadFindBox(Box):
         replaceBox.text = "Replace Text:"
         replaceBox.show()
 
-        self.replaceEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        self.replaceEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                                  size_hint_align=FILL_HORIZ)
         self.replaceEntry.single_line_set(True)
         self.replaceEntry.scrollable_set(True)
         self.replaceEntry.show()
@@ -946,7 +998,7 @@ class ePadFindBox(Box):
         closeButton.callback_pressed_add(self._parent.showFind)
         closeButton.show()
 
-        self.caseCheck = Check(self._canvas, text = "Case Sensitive")
+        self.caseCheck = Check(self._canvas, text="Case Sensitive")
         self.caseCheck.state_set(self._parent.config['case_sensitive'])
         self.caseCheck.callback_changed_add(self.caseUpdate)
         self.caseCheck.show()
@@ -960,6 +1012,7 @@ class ePadFindBox(Box):
         self.pack_end(buttonBox)
 
     def replacePressed(self, obj):
+        ''' find-and-replace activated '''
         tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get())
         if not self.caseCheck.state_get():
             search_string = self.findEntry.text.lower()
@@ -988,13 +1041,15 @@ class ePadFindBox(Box):
                 self._parent.tabbs.current.textEdited()
                 self._parent.tabbs.current.takeSnapShot()
             else:
-                errorPopup(self._parent.mainWindow, "Text %s not found. Nothing replaced."%search_string)
+                errorPopup(self._parent.mainWindow, "Text %s not found.\
+                           Nothing replaced."%search_string)
             #else:
             #    errorPopup(self._parent.mainWindow, "No replacement string entered.")
         else:
             errorPopup(self._parent.mainWindow, "No find string entered.")
 
     def findPressed(self, obj):
+        ''' search for next instance '''
         if not self.caseCheck.state_get():
             search_string = self.findEntry.text.lower()
             tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get()).lower()
@@ -1014,13 +1069,15 @@ class ePadFindBox(Box):
                         self.currentFind = locations[lastFind+1]
                     else:
                         self.currentFind = locations[0]
-                self._parent.tabbs.current.mainEn.select_region_set(self.currentFind, self.currentFind+search_length)
+                self._parent.tabbs.current.mainEn.select_region_set(self.currentFind,
+                                                                    self.currentFind+search_length)
             else:
                 errorPopup(self._parent.mainWindow, "Text %s not found."%search_string)
         else:
             errorPopup(self._parent.mainWindow, "No find string entered.")
 
     def findAll(self, a_str, sub):
+        ''' find all instances of search key '''
         start = 0
         while True:
             start = a_str.find(sub, start)
@@ -1029,10 +1086,12 @@ class ePadFindBox(Box):
             start += len(sub) + 1
 
     def caseUpdate(self, ck):
+        ''' if case sensitive or not '''
         self._parent.config['case_sensitive'] = ck.state_get()
 
 
 class ePadToolbar(Toolbar):
+    ''' application toolbar '''
     def __init__(self, parent, canvas):
         Toolbar.__init__(self, canvas)
         self._parent = parent
@@ -1052,7 +1111,8 @@ class ePadToolbar(Toolbar):
         self.item_append("document-open", "Open",
                          lambda self, obj: self._parent.openFile())
         self.savebtn = self.item_append("document-save", "Save",
-                         lambda self, obj: self._parent.saveFile())
+                                        lambda self,
+                                               obj: self._parent.saveFile())
         self.savebtn.disabled = True
         self.item_append("document-save-as", "Save As",
                          lambda self, obj: self._parent.saveAs())
@@ -1108,6 +1168,7 @@ class ePadToolbar(Toolbar):
                          self.showAbout)
 
     def showAbout(self, obj, it):
+        ''' display version information '''
         try:
             AboutWindow(self, title="ePad", standardicon="accessories-text-editor", \
                         version=__version__, authors=AUTHORS, \
@@ -1120,8 +1181,9 @@ class ePadToolbar(Toolbar):
     # Hack to toogle word wrap state with line numbers state   ##
     #############################################################
     def optionsToggle(self, obj, it):
+        ''' toggle wordwrap/linenumbers '''
         wordwrap = self._parent.config['word_wrap']
-        linenum =  self._parent.config['line_numbers']
+        linenum = self._parent.config['line_numbers']
 
         if it.text == "Wordwrap":
             if wordwrap == ELM_WRAP_MIXED:
@@ -1146,7 +1208,7 @@ class ePadToolbar(Toolbar):
             tab.mainEn.line_wrap_set(wordwrap)
             # for some reason have to reset font style
             while tab.mainEn.text_style_user_peek():
-                tab.mainEn.text_style_user_pop();
+                tab.mainEn.text_style_user_pop()
             tab.mainEn.text_style_user_push(self._parent.tabbs.current.font_style)
         # Change line number state of all open tabs
         if linenum:
@@ -1166,39 +1228,46 @@ class ePadToolbar(Toolbar):
         self._parent.config['word_wrap'] = wordwrap
         self._parent.config['line_numbers'] = linenum
         resetCloseMenuCount(None)
-        
-    def unDoPress(self, obj, it):
 
+    def unDoPress(self, obj, it):
+        ''' handler for undo pressed '''
         self._parent.tabbs.current.unDo()
         resetCloseMenuCount(None)
 
     def reDoPress(self, obj, it):
+        ''' handler for redo pressed '''
         self._parent.tabbs.current.reDo()
         resetCloseMenuCount(None)
 
     def copyPress(self, obj, it):
+        ''' handler for copy pressed '''
         self._parent.tabbs.current.mainEn.selection_copy()
         resetCloseMenuCount(None)
 
     def itemClicked(self, obj, item):
+        ''' dispatcher for button pressed '''
         if item.menu_get() is None and item.selected_get():
             item.selected_set(False)
         elif item.menu_get():
             closeMenu(item, item.text_get())
 
     def pastePress(self, obj, it):
+        ''' handler for paste pressed '''
         self._parent.tabbs.current.mainEn.selection_paste()
         resetCloseMenuCount(None)
 
     def cutPress(self, obj, it):
+        ''' handler for cut pressed '''
         self._parent.tabbs.current.mainEn.selection_cut()
         resetCloseMenuCount(None)
 
     def selectAllPress(self, obj, it):
+        ''' handler for select all pressed '''
         self._parent.tabbs.current.mainEn.select_all()
         resetCloseMenuCount(None)
 
     def optionsNew(self, obj, it):
+        ''' doesn't seem to do anything???! '''
         self._parent.newInstance = not self._parent.newInstance
         if self._parent.newInstance:
             it.content.state = True
@@ -1292,6 +1361,7 @@ class ePadConf(object):
         return set(ePadConf.default) == set(self.data)
 
     def write(self):
+        ''' write config file '''
         with open(self.path, "w") as config_file:
             json.dump(self.data, config_file, sort_keys=True, indent=4, separators=(',', ': '))
 
