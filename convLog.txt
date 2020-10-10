@@ -67,5 +67,17 @@ Next: add docstrings; check for long lines;
 note: some of the long lines broke up lambdas...
          in fact, had to correct one of those to satisfy pylint
 Corrected indentation and spaces and line-too-long pylint errors
-
-
+Re-wrote a loop at 1415 to make it easier to shorten the lines
+        if settings is not None:
+            #for setting, value in list(settings.items()) if isinstance(settings, Mapping) else settings:
+            if isinstance(settings, Mapping):
+                settngs2 =l ist(settings.items())
+            else:
+                settngs2 = settings
+            for setting, value in settngs2:
+                self.__safe_set(setting, value)
+        for setting, value in list(kwargs.items()):
+            self.__safe_set(setting, value)
+        self.write()
+disable=too-many-lines
+changed all instances of errorPopup to error_popup

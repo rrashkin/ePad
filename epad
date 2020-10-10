@@ -1,6 +1,7 @@
 ''' Simple text editor written in Elementary and Python '''
 #!/usr/bin/python
 # encoding: utf-8
+#pylint: disable=too-many-lines
 
 # ePad - a simple text editor written in Elementary and Python
 #
@@ -139,25 +140,25 @@ def print_err(*args, **kwargs):
     """
     print('[ePad]:', *args, file=sys.stderr, **kwargs)
 
-def errorPopup(window, errorMsg):
+def error_popup(window, errorMsg):
     ''' create a popup alert '''
-    errorPopup = Popup(window, size_hint_weight=EXPAND_BOTH)
-    errorPopup.callback_block_clicked_add(lambda obj: errorPopup.delete())
+    error_popup = Popup(window, size_hint_weight=EXPAND_BOTH)
+    error_popup.callback_block_clicked_add(lambda obj: error_popup.delete())
 
     # Add a table to hold dialog image and text to Popup
-    tb = Table(errorPopup, size_hint_weight=EXPAND_BOTH)
-    errorPopup.part_content_set("default", tb)
+    tb = Table(error_popup, size_hint_weight=EXPAND_BOTH)
+    error_popup.part_content_set("default", tb)
     tb.show()
 
     # Add dialog-error Image to table
-    icon = Icon(errorPopup, resizable=(True, True),
+    icon = Icon(error_popup, resizable=(True, True),
                 size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
     icon.standard_set('dialog-warning')
     tb.pack(icon, 0, 0, 1, 1)
     icon.show()
 
     # Add dialog text to table
-    dialogLabel = Label(errorPopup, line_wrap=ELM_WRAP_WORD,
+    dialogLabel = Label(error_popup, line_wrap=ELM_WRAP_WORD,
                         size_hint_weight=EXPAND_HORIZ,
                         size_hint_align=FILL_BOTH)
     dialogLabel.text = errorMsg
@@ -165,14 +166,14 @@ def errorPopup(window, errorMsg):
     dialogLabel.show()
 
     # Ok Button
-    ok_btt = Button(errorPopup)
+    ok_btt = Button(error_popup)
     ok_btt.text = "Ok"
-    ok_btt.callback_clicked_add(lambda obj: errorPopup.delete())
+    ok_btt.callback_clicked_add(lambda obj: error_popup.delete())
     ok_btt.show()
 
     # add button to popup
-    errorPopup.part_content_set("button3", ok_btt)
-    errorPopup.show()
+    error_popup.part_content_set("button3", ok_btt)
+    error_popup.show()
 
 
 def closeMenu(obj, label):
@@ -385,12 +386,12 @@ class Interface(object):
                         errorMsg = ("Permision denied: <b>'%s'</b>."
                                     "<br><br>Operation failed !!!"
                                     % (file_selected))
-                        errorPopup(self.mainWindow, errorMsg)
+                        error_popup(self.mainWindow, errorMsg)
                     else:
                         errorMsg = ("ERROR: %s: '%s'"
                                     "<br><br>Operation failed !!!"
                                     % (err.strerror, file_selected))
-                        errorPopup(self.mainWindow, errorMsg)
+                        error_popup(self.mainWindow, errorMsg)
                     return
                 newfile.close()
                 # if entry is empty and the file does not exists then
@@ -424,7 +425,7 @@ class Interface(object):
                     errorMsg = ("<b>'%s'</b> is a folder."
                                 "<br><br>Operation failed !!!"
                                 % (current_file))
-                    errorPopup(self.mainWindow, errorMsg)
+                    error_popup(self.mainWindow, errorMsg)
                     return
                 elif os.path.exists(file_selected):
                     self.tabbs.current.fileExists(file_selected)
@@ -562,7 +563,7 @@ class Interface(object):
                 else:
                     errorMsg = ("<b>'%s'</b> is an Invalid path."
                                 "<br><br>Open failed !!!" % (ourFile))
-                    errorPopup(self.mainWindow, errorMsg)
+                    error_popup(self.mainWindow, errorMsg)
         if start and start[1]:
             if os.path.isdir(start[1]):
                 self.lastDir = start[1]
@@ -905,12 +906,12 @@ class ePadEntry(Box):
                     errorMsg = ("Permision denied: <b>'%s'</b>."
                                 "<br><br>Operation failed !!!</br>"
                                 % (file_selected))
-                    errorPopup(self._parent.mainWindow, errorMsg)
+                    error_popup(self._parent.mainWindow, errorMsg)
                 else:
                     errorMsg = ("ERROR: %s: '%s'"
                                 "<br><br>Operation failed !!!</br>"
                                 % (err.strerror, file_selected))
-                    errorPopup(self._parent.mainWindow, errorMsg)
+                    error_popup(self._parent.mainWindow, errorMsg)
                 return
             tmp_text = self.mainEn.entry_get()
                 # FIXME: Why save twice?
@@ -1041,12 +1042,12 @@ class ePadFindBox(Box):
                 self._parent.tabbs.current.textEdited()
                 self._parent.tabbs.current.takeSnapShot()
             else:
-                errorPopup(self._parent.mainWindow, "Text %s not found.\
+                error_popup(self._parent.mainWindow, "Text %s not found.\
                            Nothing replaced."%search_string)
             #else:
-            #    errorPopup(self._parent.mainWindow, "No replacement string entered.")
+            #    error_popup(self._parent.mainWindow, "No replacement string entered.")
         else:
-            errorPopup(self._parent.mainWindow, "No find string entered.")
+            error_popup(self._parent.mainWindow, "No find string entered.")
 
     def findPressed(self, obj):
         ''' search for next instance '''
@@ -1072,9 +1073,9 @@ class ePadFindBox(Box):
                 self._parent.tabbs.current.mainEn.select_region_set(self.currentFind,
                                                                     self.currentFind+search_length)
             else:
-                errorPopup(self._parent.mainWindow, "Text %s not found."%search_string)
+                error_popup(self._parent.mainWindow, "Text %s not found."%search_string)
         else:
-            errorPopup(self._parent.mainWindow, "No find string entered.")
+            error_popup(self._parent.mainWindow, "No find string entered.")
 
     def findAll(self, a_str, sub):
         ''' find all instances of search key '''
@@ -1412,7 +1413,11 @@ class ePadConf(object):
                 config.update({'font': 'Mono', 'font_size': 24})
         """
         if settings is not None:
-            for setting, value in list(settings.items()) if isinstance(settings, Mapping) else settings:
+            if isinstance(settings, Mapping):
+                settngs2 = list(settings.items())
+            else:
+                settngs2 = settings
+            for setting, value in settngs2:
                 self.__safe_set(setting, value)
         for setting, value in list(kwargs.items()):
             self.__safe_set(setting, value)
