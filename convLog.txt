@@ -81,3 +81,6 @@ Re-wrote a loop at 1415 to make it easier to shorten the lines
         self.write()
 disable=too-many-lines
 changed all instances of errorPopup to error_popup
+moved import statements up before any assignments
+took out double import - urllib.request
+errorMsg >> error_msg; subsequent indentation

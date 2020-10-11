@@ -18,6 +18,56 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+import errno
+import sys
+import os
+import urllib.parse
+import urllib.error
+import io
+import json
+from collections import Mapping
+
+try:
+    # Python3
+    import urllib.request
+except ImportError:
+    pass
+import re
+
+from efl import ecore
+from efl.evas import EVAS_HINT_EXPAND, EVAS_HINT_FILL,\
+                     EVAS_CALLBACK_KEY_UP, EVAS_EVENT_FLAG_ON_HOLD
+from efl import elementary
+from efl.elementary.window import StandardWindow
+from efl.elementary.box import Box
+from efl.elementary.button import Button
+from efl.elementary.label import Label, ELM_WRAP_WORD
+from efl.elementary.icon import Icon
+from efl.elementary.notify import Notify, ELM_NOTIFY_ALIGN_FILL
+from efl.elementary.separator import Separator
+from efl.elementary.scroller import Scroller
+from efl.elementary.frame import Frame
+from efl.elementary.entry import Entry, ELM_TEXT_FORMAT_PLAIN_UTF8,\
+                                 markup_to_utf8, utf8_to_markup,\
+                                 ELM_WRAP_NONE, ELM_WRAP_MIXED
+from efl.elementary.popup import Popup
+from efl.elementary.toolbar import Toolbar, ELM_OBJECT_SELECT_MODE_DEFAULT
+from efl.elementary.flip import Flip, ELM_FLIP_ROTATE_XZ_CENTER_AXIS,\
+                                ELM_FLIP_ROTATE_YZ_CENTER_AXIS,\
+                                ELM_FLIP_INTERACTION_ROTATE
+from efl.elementary.table import Table
+from efl.elementary.check import Check
+from efl.elementary.naviframe import Naviframe
+
+# Imported here to stop class resolver complaining when an input event
+# applies to an internal layout object
+from efl.elementary.layout import Layout
+
+from elmextensions import AboutWindow, InstanceError
+from elmextensions import FileSelector
+from elmextensions import TabbedBox
+
   # May as well bite the bullet
 
 __author__ = "Jeff Hoogland"
@@ -75,54 +125,6 @@ INFO = """
 """
 
 
-import errno
-import sys
-import os
-import urllib.request, urllib.parse, urllib.error
-import io
-import json
-from collections import Mapping
-
-try:
-    # Python3
-    import urllib.request
-except ImportError:
-    pass
-import re
-
-from efl import ecore
-from efl.evas import EVAS_HINT_EXPAND, EVAS_HINT_FILL,\
-                     EVAS_CALLBACK_KEY_UP, EVAS_EVENT_FLAG_ON_HOLD
-from efl import elementary
-from efl.elementary.window import StandardWindow
-from efl.elementary.box import Box
-from efl.elementary.button import Button
-from efl.elementary.label import Label, ELM_WRAP_WORD
-from efl.elementary.icon import Icon
-from efl.elementary.notify import Notify, ELM_NOTIFY_ALIGN_FILL
-from efl.elementary.separator import Separator
-from efl.elementary.scroller import Scroller
-from efl.elementary.frame import Frame
-from efl.elementary.entry import Entry, ELM_TEXT_FORMAT_PLAIN_UTF8,\
-                                 markup_to_utf8, utf8_to_markup,\
-                                 ELM_WRAP_NONE, ELM_WRAP_MIXED
-from efl.elementary.popup import Popup
-from efl.elementary.toolbar import Toolbar, ELM_OBJECT_SELECT_MODE_DEFAULT
-from efl.elementary.flip import Flip, ELM_FLIP_ROTATE_XZ_CENTER_AXIS,\
-                                ELM_FLIP_ROTATE_YZ_CENTER_AXIS,\
-                                ELM_FLIP_INTERACTION_ROTATE
-from efl.elementary.table import Table
-from efl.elementary.check import Check
-from efl.elementary.naviframe import Naviframe
-
-# Imported here to stop class resolver complaining when an input event
-# applies to an internal layout object
-from efl.elementary.layout import Layout
-
-from elmextensions import AboutWindow, InstanceError
-from elmextensions import FileSelector
-from elmextensions import TabbedBox
-
 EXPAND_BOTH = EVAS_HINT_EXPAND, EVAS_HINT_EXPAND
 EXPAND_HORIZ = EVAS_HINT_EXPAND, 0.0
 FILL_BOTH = EVAS_HINT_FILL, EVAS_HINT_FILL
@@ -140,7 +142,7 @@ def print_err(*args, **kwargs):
     """
     print('[ePad]:', *args, file=sys.stderr, **kwargs)
 
-def error_popup(window, errorMsg):
+def error_popup(window, error_msg):
     ''' create a popup alert '''
     error_popup = Popup(window, size_hint_weight=EXPAND_BOTH)
     error_popup.callback_block_clicked_add(lambda obj: error_popup.delete())
@@ -161,7 +163,7 @@ def error_popup(window, errorMsg):
     dialogLabel = Label(error_popup, line_wrap=ELM_WRAP_WORD,
                         size_hint_weight=EXPAND_HORIZ,
                         size_hint_align=FILL_BOTH)
-    dialogLabel.text = errorMsg
+    dialogLabel.text = error_msg
     tb.pack(dialogLabel, 1, 0, 1, 1)
     dialogLabel.show()
 
@@ -383,15 +385,15 @@ class Interface(object):
                     newfile = io.open(file_selected, 'w')
                 except IOError as err:
                     if err.errno == errno.EACCES:
-                        errorMsg = ("Permision denied: <b>'%s'</b>."
-                                    "<br><br>Operation failed !!!"
-                                    % (file_selected))
-                        error_popup(self.mainWindow, errorMsg)
+                        error_msg = ("Permision denied: <b>'%s'</b>."
+                                     "<br><br>Operation failed !!!"
+                                     % (file_selected))
+                        error_popup(self.mainWindow, error_msg)
                     else:
-                        errorMsg = ("ERROR: %s: '%s'"
-                                    "<br><br>Operation failed !!!"
-                                    % (err.strerror, file_selected))
-                        error_popup(self.mainWindow, errorMsg)
+                        error_msg = ("ERROR: %s: '%s'"
+                                     "<br><br>Operation failed !!!"
+                                     % (err.strerror, file_selected))
+                        error_popup(self.mainWindow, error_msg)
                     return
                 newfile.close()
                 # if entry is empty and the file does not exists then
@@ -422,10 +424,10 @@ class Interface(object):
             if IsSave == "save":
                 if os.path.isdir(file_selected):
                     current_file = os.path.basename(file_selected)
-                    errorMsg = ("<b>'%s'</b> is a folder."
-                                "<br><br>Operation failed !!!"
-                                % (current_file))
-                    error_popup(self.mainWindow, errorMsg)
+                    error_msg = ("<b>'%s'</b> is a folder."
+                                 "<br><br>Operation failed !!!"
+                                 % (current_file))
+                    error_popup(self.mainWindow, error_msg)
                     return
                 elif os.path.exists(file_selected):
                     self.tabbs.current.fileExists(file_selected)
@@ -561,9 +563,9 @@ class Interface(object):
                         ##print(ourFile)
                         self.addFile(ourFile)
                 else:
-                    errorMsg = ("<b>'%s'</b> is an Invalid path."
-                                "<br><br>Open failed !!!" % (ourFile))
-                    error_popup(self.mainWindow, errorMsg)
+                    error_msg = ("<b>'%s'</b> is an Invalid path."
+                                 "<br><br>Open failed !!!" % (ourFile))
+                    error_popup(self.mainWindow, error_msg)
         if start and start[1]:
             if os.path.isdir(start[1]):
                 self.lastDir = start[1]
@@ -903,15 +905,15 @@ class ePadEntry(Box):
                 #print("ERROR: {0}: '{1}'".format(err.strerror,
                 #                                    file_selected))
                 if err.errno == errno.EACCES:
-                    errorMsg = ("Permision denied: <b>'%s'</b>."
-                                "<br><br>Operation failed !!!</br>"
-                                % (file_selected))
-                    error_popup(self._parent.mainWindow, errorMsg)
+                    error_msg = ("Permision denied: <b>'%s'</b>."
+                                 "<br><br>Operation failed !!!</br>"
+                                 % (file_selected))
+                    error_popup(self._parent.mainWindow, error_msg)
                 else:
-                    errorMsg = ("ERROR: %s: '%s'"
-                                "<br><br>Operation failed !!!</br>"
-                                % (err.strerror, file_selected))
-                    error_popup(self._parent.mainWindow, errorMsg)
+                    error_msg = ("ERROR: %s: '%s'"
+                                 "<br><br>Operation failed !!!</br>"
+                                 % (err.strerror, file_selected))
+                    error_popup(self._parent.mainWindow, error_msg)
                 return
             tmp_text = self.mainEn.entry_get()
                 # FIXME: Why save twice?
