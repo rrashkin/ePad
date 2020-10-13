@@ -84,3 +84,12 @@ changed all instances of errorPopup to error_popup
 moved import statements up before any assignments
 took out double import - urllib.request
 errorMsg >> error_msg; subsequent indentation
+variable, tb >> _tb
+variable, dialogLabel >> dialog_lbl; subsequent indentation
+variable, closeMenu >> close_menu
+commented out "global close_menu
+function, resetCloseMenuCount >> reset_closemenu_count
+attribute, confirmPopup >> cnfrm_popup; some indentation
+attribute, mainWindow >> main_wndw; indentation
+attribute, mainBox >> main_box; indentation
+attribute, mainTb >> main_tb

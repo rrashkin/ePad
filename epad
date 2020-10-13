@@ -148,24 +148,24 @@ def error_popup(window, error_msg):
     error_popup.callback_block_clicked_add(lambda obj: error_popup.delete())
 
     # Add a table to hold dialog image and text to Popup
-    tb = Table(error_popup, size_hint_weight=EXPAND_BOTH)
-    error_popup.part_content_set("default", tb)
-    tb.show()
+    _tb = Table(error_popup, size_hint_weight=EXPAND_BOTH)
+    error_popup.part_content_set("default", _tb)
+    _tb.show()
 
     # Add dialog-error Image to table
     icon = Icon(error_popup, resizable=(True, True),
                 size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
     icon.standard_set('dialog-warning')
-    tb.pack(icon, 0, 0, 1, 1)
+    _tb.pack(icon, 0, 0, 1, 1)
     icon.show()
 
     # Add dialog text to table
-    dialogLabel = Label(error_popup, line_wrap=ELM_WRAP_WORD,
-                        size_hint_weight=EXPAND_HORIZ,
-                        size_hint_align=FILL_BOTH)
-    dialogLabel.text = error_msg
-    tb.pack(dialogLabel, 1, 0, 1, 1)
-    dialogLabel.show()
+    dialog_lbl = Label(error_popup, line_wrap=ELM_WRAP_WORD,
+                       size_hint_weight=EXPAND_HORIZ,
+                       size_hint_align=FILL_BOTH)
+    dialog_lbl.text = error_msg
+    _tb.pack(dialog_lbl, 1, 0, 1, 1)
+    dialog_lbl.show()
 
     # Ok Button
     ok_btt = Button(error_popup)
@@ -178,96 +178,96 @@ def error_popup(window, error_msg):
     error_popup.show()
 
 
-def closeMenu(obj, label):
+def close_menu(obj, label):
     ''' set menu attributes for close '''
-    if not hasattr(closeMenu, 'count'):
-        closeMenu.count = 0
-    if not hasattr(closeMenu, 'name'):
-        closeMenu.lastItem = label
-    if closeMenu.lastItem != label:
-        closeMenu.count = 0
-    if closeMenu.count:
+    if not hasattr(close_menu, 'count'):
+        close_menu.count = 0
+    if not hasattr(close_menu, 'name'):
+        close_menu.lastItem = label
+    if close_menu.lastItem != label:
+        close_menu.count = 0
+    if close_menu.count:
         obj.selected_set(False)
         obj.menu_get().close()
-    closeMenu.count = (closeMenu.count + 1) % 2
+    close_menu.count = (close_menu.count + 1) % 2
 
 
-def resetCloseMenuCount(obj):
+def reset_closemenu_count(obj):
     ''' reset count for close menu '''
-    global closeMenu
-    if hasattr(closeMenu, 'count'):
-        closeMenu.count = 0
+    # global close_menu
+    if hasattr(close_menu, 'count'):
+        close_menu.count = 0
 
 class Interface(object):
     ''' container class for editor interface '''
     def __init__(self):
-        self.confirmPopup = None
+        self.cnfrm_popup = None
         self.config = ePadConf()
 
-        self.mainWindow = StandardWindow("epad", "Untitled - ePad",
-                                         size=(600, 400))
-        self.mainWindow.callback_delete_request_add(self.closeChecks)
-        self.mainWindow.elm_event_callback_add(self.eventsCb)
-        #self.mainWindow.repeat_events_set(False)
+        self.main_wndw = StandardWindow("epad", "Untitled - ePad",
+                                        size=(600, 400))
+        self.main_wndw.callback_delete_request_add(self.closeChecks)
+        self.main_wndw.elm_event_callback_add(self.eventsCb)
+        #self.main_wndw.repeat_events_set(False)
 
-        icon = Icon(self.mainWindow,
+        icon = Icon(self.main_wndw,
                     size_hint_weight=EXPAND_BOTH,
                     size_hint_align=FILL_BOTH)
         icon.standard_set('accessories-text-editor')
         icon.show()
-        self.mainWindow.icon_object_set(icon.object_get())
+        self.main_wndw.icon_object_set(icon.object_get())
 
-        self.mainBox = Box(self.mainWindow,
-                           size_hint_weight=EXPAND_BOTH,
-                           size_hint_align=FILL_BOTH)
-        self.mainBox.show()
+        self.main_box = Box(self.main_wndw,
+                            size_hint_weight=EXPAND_BOTH,
+                            size_hint_align=FILL_BOTH)
+        self.main_box.show()
 
-        self.mainTb = ePadToolbar(self, self.mainWindow)
-        self.mainTb.focus_allow = False
-        self.mainTb.show()
+        self.main_tb = ePadToolbar(self, self.main_wndw)
+        self.main_tb.focus_allow = False
+        self.main_tb.show()
 
-        self.mainBox.pack_end(self.mainTb)
+        self.main_box.pack_end(self.main_tb)
 
         # Root User Notification
         if os.geteuid() == 0:
             # print_err("Caution: Root User")
             if self.config["notify_root"]:
-                notifyBox = Box(self.mainWindow, horizontal=True,
+                notifyBox = Box(self.main_wndw, horizontal=True,
                                 size_hint_weight=EXPAND_HORIZ,
                                 size_hint_align=FILL_BOTH)
-                notifyLabel = Label(self.mainWindow, style="default/center",
+                notifyLabel = Label(self.main_wndw, style="default/center",
                                     size_hint_weight=EXPAND_HORIZ,
                                     size_hint_align=FILL_BOTH)
                 notifyLabel.text = "<b><i>Root User</i></b>"
                 notifyBox.pack_end(notifyLabel)
                 notifyLabel.show()
-                self.mainBox.pack_end(notifyBox)
+                self.main_box.pack_end(notifyBox)
                 notifyBox.show()
 
-        self.findBox = ePadFindBox(self, self.mainWindow)
+        self.findBox = ePadFindBox(self, self.main_wndw)
         self.findVisible = False
 
-        self.tabbs = TabbedBox(self.mainWindow, size_hint_weight=EXPAND_BOTH,
+        self.tabbs = TabbedBox(self.main_wndw, size_hint_weight=EXPAND_BOTH,
                                size_hint_align=FILL_BOTH)
         self.tabbs.closeCallback = self.closeFile
         self.tabbs.emptyCallback = self.baseFile
         self.tabbs.tabChangedCallback = self.tabChanged
         self.tabbs.show()
 
-        self.mainBox.pack_end(self.tabbs)
+        self.main_box.pack_end(self.tabbs)
 
         # Build our file selector for saving/loading files
-        self.fileBox = Box(self.mainWindow,
+        self.fileBox = Box(self.main_wndw,
                            size_hint_weight=EXPAND_BOTH,
                            size_hint_align=FILL_BOTH)
         self.fileBox.show()
 
-        self.fileLabel = Label(self.mainWindow,
+        self.fileLabel = Label(self.main_wndw,
                                size_hint_weight=EXPAND_HORIZ,
                                size_hint_align=FILL_BOTH, text="")
         self.fileLabel.show()
         self.lastDir = os.getenv("HOME")
-        self.fileSelector = FileSelector(self.mainWindow,
+        self.fileSelector = FileSelector(self.main_wndw,
                                          defaultPath=self.lastDir,
                                          defaultPopulate=False,
                                          size_hint_weight=EXPAND_BOTH,
@@ -283,17 +283,17 @@ class Interface(object):
 
         # Flip object has the file selector on one side
         #   and the GUI on the other
-        self.flip = Flip(self.mainWindow, size_hint_weight=EXPAND_BOTH,
+        self.flip = Flip(self.main_wndw, size_hint_weight=EXPAND_BOTH,
                          size_hint_align=FILL_BOTH)
-        self.flip.part_content_set("front", self.mainBox)
+        self.flip.part_content_set("front", self.main_box)
         self.flip.part_content_set("back", self.fileBox)
-        self.mainWindow.resize_object_add(self.flip)
+        self.main_wndw.resize_object_add(self.flip)
         self.flip.show()
 
     def tabChanged(self, tabbs, widget):
         ''' handler for when focus changes tabs '''
-        self.mainWindow.title = widget.data["button"].text
-        self.mainTb.savebtn.disabled = not widget.dirty
+        self.main_wndw.title = widget.data["button"].text
+        self.main_tb.savebtn.disabled = not widget.dirty
 
     def addFile(self, filePath):
         ''' add file to new tab '''
@@ -348,7 +348,7 @@ class Interface(object):
     def showFind(self, obj=None):
         ''' display find dialog '''
         if not self.findVisible:
-            self.mainBox.pack_before(self.findBox, self.tabbs)
+            self.main_box.pack_before(self.findBox, self.tabbs)
             self.findBox.findEntry.text = self.tabbs.current.mainEn.selection_get()
             self.findBox.findEntry.focus_set(True)
             self.findBox.findEntry.cursor_end_set()
@@ -360,7 +360,7 @@ class Interface(object):
     def hideFind(self, obj=None):
         ''' hide find dialog '''
         if self.findVisible:
-            self.mainBox.unpack(self.findBox)
+            self.main_box.unpack(self.findBox)
             self.findBox.hide()
             self.findVisible = False
 
@@ -388,12 +388,12 @@ class Interface(object):
                         error_msg = ("Permision denied: <b>'%s'</b>."
                                      "<br><br>Operation failed !!!"
                                      % (file_selected))
-                        error_popup(self.mainWindow, error_msg)
+                        error_popup(self.main_wndw, error_msg)
                     else:
                         error_msg = ("ERROR: %s: '%s'"
                                      "<br><br>Operation failed !!!"
                                      % (err.strerror, file_selected))
-                        error_popup(self.mainWindow, error_msg)
+                        error_popup(self.main_wndw, error_msg)
                     return
                 newfile.close()
                 # if entry is empty and the file does not exists then
@@ -427,7 +427,7 @@ class Interface(object):
                     error_msg = ("<b>'%s'</b> is a folder."
                                  "<br><br>Operation failed !!!"
                                  % (current_file))
-                    error_popup(self.mainWindow, error_msg)
+                    error_popup(self.main_wndw, error_msg)
                     return
                 elif os.path.exists(file_selected):
                     self.tabbs.current.fileExists(file_selected)
@@ -463,53 +463,53 @@ class Interface(object):
         else:
             self.unsavedWorkPopup()
 
-    def closePopup(self, bt, confirmPopup):
+    def closePopup(self, bt, cnfrm_popup):
         ''' close are-you-sure? popup '''
-        self.confirmPopup.delete()
-        self.confirmPopup = None
+        self.cnfrm_popup.delete()
+        self.cnfrm_popup = None
 
     def unsavedWorkPopup(self):
         ''' warn unsaved changes '''
-        if self.confirmPopup:
+        if self.cnfrm_popup:
             return
 
-        self.confirmPopup = Popup(self.mainWindow,
-                                  size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup = Popup(self.main_wndw,
+                                 size_hint_weight=EXPAND_BOTH)
 
         # Add a table to hold dialog image and text to Popup
-        tb = Table(self.confirmPopup, size_hint_weight=EXPAND_BOTH)
-        self.confirmPopup.part_content_set("default", tb)
+        tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup.part_content_set("default", tb)
         tb.show()
 
         # Add dialog-error Image to table
-        icon = Icon(self.confirmPopup, resizable=(True, True),
+        icon = Icon(self.cnfrm_popup, resizable=(True, True),
                     size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
         tb.pack(icon, 0, 0, 1, 1)
         icon.show()
         # Add dialog text to table
-        dialogLabel = Label(self.confirmPopup, line_wrap=ELM_WRAP_WORD,
-                            size_hint_weight=EXPAND_HORIZ,
-                            size_hint_align=FILL_BOTH)
-        dialogLabel.text = "You have unsaved work. Close anyways?<br><br>"
-        tb.pack(dialogLabel, 1, 0, 1, 1)
-        dialogLabel.show()
+        dialog_lbl = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
+                           size_hint_weight=EXPAND_HORIZ,
+                           size_hint_align=FILL_BOTH)
+        dialog_lbl.text = "You have unsaved work. Close anyways?<br><br>"
+        tb.pack(dialog_lbl, 1, 0, 1, 1)
+        dialog_lbl.show()
 
         # Close without saving button
-        no_btt = Button(self.mainWindow)
+        no_btt = Button(self.main_wndw)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.confirmPopup)
+        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         no_btt.show()
         # Save the file and then close button
-        sav_btt = Button(self.mainWindow)
+        sav_btt = Button(self.main_wndw)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self.closeApp)
         sav_btt.show()
 
         # add buttons to popup
-        self.confirmPopup.part_content_set("button1", no_btt)
-        self.confirmPopup.part_content_set("button3", sav_btt)
-        self.confirmPopup.show()
+        self.cnfrm_popup.part_content_set("button1", no_btt)
+        self.cnfrm_popup.part_content_set("button3", sav_btt)
+        self.cnfrm_popup.show()
 
     def eventsCb(self, obj, src, event_type, event):
         ''' callback to process button press events '''
@@ -565,7 +565,7 @@ class Interface(object):
                 else:
                     error_msg = ("<b>'%s'</b> is an Invalid path."
                                  "<br><br>Open failed !!!" % (ourFile))
-                    error_popup(self.mainWindow, error_msg)
+                    error_popup(self.main_wndw, error_msg)
         if start and start[1]:
             if os.path.isdir(start[1]):
                 self.lastDir = start[1]
@@ -575,7 +575,7 @@ class Interface(object):
         if not len(self.tabbs.tabs):
             self.addFile("Untitled")
 
-        self.mainWindow.show()
+        self.main_wndw.show()
 
 class ePadEntry(Box):
     ''' tile text entry box in main window '''
@@ -629,7 +629,7 @@ class ePadEntry(Box):
                             size_hint_weight=(0.85, EVAS_HINT_EXPAND),
                             size_hint_align=FILL_BOTH)
         self.mainEn.callback_changed_user_add(self.textEdited)
-        self.mainEn.callback_clicked_add(resetCloseMenuCount)
+        self.mainEn.callback_clicked_add(reset_closemenu_count)
         self.mainEn.callback_selection_cut_add(self.takeSnapShot)
         self.mainEn.callback_selection_paste_add(self.takeSnapShot)
         # Don't let lineList steal focus
@@ -766,20 +766,20 @@ class ePadEntry(Box):
         ''' set unsaved changes condition '''
         if dirty:
             self.dirty = True
-            self._parent.mainWindow.title = "*" + self._parent.mainWindow.title
+            self._parent.main_wndw.title = "*" + self._parent.main_wndw.title
             try:
                 self.data["button"].text = "*" + self.data["button"].text
             except:
                 pass
-            self._parent.mainTb.savebtn.disabled = False
+            self._parent.main_tb.savebtn.disabled = False
         else:
             self.dirty = False
-            self._parent.mainWindow.title = self._parent.mainWindow.title[1:]
+            self._parent.main_wndw.title = self._parent.main_wndw.title[1:]
             try:
                 self.data["button"].text = self.data["button"].text[1:]
             except:
                 pass
-            self._parent.mainTb.savebtn.disabled = True
+            self._parent.main_tb.savebtn.disabled = True
 
     def textEdited(self, obj=None):
         ''' keep track if changes saved or not '''
@@ -809,85 +809,85 @@ class ePadEntry(Box):
 
     def confirmSave(self):
         ''' double-check save '''
-        self.confirmPopup = Popup(self._parent.mainWindow,
-                                  size_hint_weight=EXPAND_BOTH)
-        self.confirmPopup.part_text_set("title,text", "File Unsaved")
+        self.cnfrm_popup = Popup(self._parent.main_wndw,
+                                 size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup.part_text_set("title,text", "File Unsaved")
         current_file = self.mainEn.file[0]
         current_file = \
             os.path.basename(current_file) if current_file else "Untitled"
-        self.confirmPopup.text = "Save changes to '%s'?" % (current_file)
+        self.cnfrm_popup.text = "Save changes to '%s'?" % (current_file)
         # Close without saving button
-        no_btt = Button(self._parent.mainWindow)
+        no_btt = Button(self._parent.main_wndw)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.confirmPopup)
+        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         no_btt.callback_clicked_add(lambda o: self._parent.tabbs.deleteTab(self))
         no_btt.show()
         # cancel close request
-        cancel_btt = Button(self._parent.mainWindow)
+        cancel_btt = Button(self._parent.main_wndw)
         cancel_btt.text = "Cancel"
-        cancel_btt.callback_clicked_add(self.closePopup, self.confirmPopup)
+        cancel_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         cancel_btt.show()
         # Save the file and then close button
-        sav_btt = Button(self._parent.mainWindow)
+        sav_btt = Button(self._parent.main_wndw)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self._parent.saveFile)
-        sav_btt.callback_clicked_add(self.closePopup, self.confirmPopup)
+        sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         sav_btt.show()
 
         # add buttons to popup
-        self.confirmPopup.part_content_set("button1", no_btt)
-        self.confirmPopup.part_content_set("button2", cancel_btt)
-        self.confirmPopup.part_content_set("button3", sav_btt)
-        self.confirmPopup.show()
+        self.cnfrm_popup.part_content_set("button1", no_btt)
+        self.cnfrm_popup.part_content_set("button2", cancel_btt)
+        self.cnfrm_popup.part_content_set("button3", sav_btt)
+        self.cnfrm_popup.show()
 
-    def closePopup(self, bt, confirmPopup):
+    def closePopup(self, bt, cnfrm_popup):
         ''' close popup '''
-        self.confirmPopup.delete()
-        self.confirmPopup = None
+        self.cnfrm_popup.delete()
+        self.cnfrm_popup = None
 
     def fileExists(self, filePath):
         ''' handler for when saveas filename exists '''
-        self.confirmPopup = Popup(self._parent.mainWindow,
-                                  size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup = Popup(self._parent.main_wndw,
+                                 size_hint_weight=EXPAND_BOTH)
 
         # Add a table to hold dialog image and text to Popup
-        tb = Table(self.confirmPopup, size_hint_weight=EXPAND_BOTH)
-        self.confirmPopup.part_content_set("default", tb)
+        tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup.part_content_set("default", tb)
         tb.show()
 
         # Add dialog-error Image to table
-        icon = Icon(self.confirmPopup, resizable=(True, True),
+        icon = Icon(self.cnfrm_popup, resizable=(True, True),
                     size_hint_weight=EXPAND_BOTH,
                     size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
         tb.pack(icon, 0, 0, 1, 1)
         icon.show()
         # Add dialog text to table
-        dialogLabel = Label(self.confirmPopup, line_wrap=ELM_WRAP_WORD,
-                            size_hint_weight=EXPAND_HORIZ,
-                            size_hint_align=FILL_BOTH)
+        dialog_lbl = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
+                           size_hint_weight=EXPAND_HORIZ,
+                           size_hint_align=FILL_BOTH)
         current_file = os.path.basename(filePath)
-        dialogLabel.text = "'%s' already exists. Overwrite?<br><br>" \
+        dialog_lbl.text = "'%s' already exists. Overwrite?<br><br>" \
                            % (current_file)
-        tb.pack(dialogLabel, 1, 0, 1, 1)
-        dialogLabel.show()
+        tb.pack(dialog_lbl, 1, 0, 1, 1)
+        dialog_lbl.show()
 
         # Close without saving button
-        no_btt = Button(self._parent.mainWindow)
+        no_btt = Button(self._parent.main_wndw)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.confirmPopup)
+        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         no_btt.show()
         # Save the file and then close button
-        sav_btt = Button(self._parent.mainWindow)
+        sav_btt = Button(self._parent.main_wndw)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self.doSelected)
-        sav_btt.callback_clicked_add(self.closePopup, self.confirmPopup)
+        sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         sav_btt.show()
 
         # add buttons to popup
-        self.confirmPopup.part_content_set("button1", no_btt)
-        self.confirmPopup.part_content_set("button3", sav_btt)
-        self.confirmPopup.show()
+        self.cnfrm_popup.part_content_set("button1", no_btt)
+        self.cnfrm_popup.part_content_set("button3", sav_btt)
+        self.cnfrm_popup.show()
 
     def doSelected(self, obj):
         ''' deal with selected file '''
@@ -908,15 +908,15 @@ class ePadEntry(Box):
                     error_msg = ("Permision denied: <b>'%s'</b>."
                                  "<br><br>Operation failed !!!</br>"
                                  % (file_selected))
-                    error_popup(self._parent.mainWindow, error_msg)
+                    error_popup(self._parent.main_wndw, error_msg)
                 else:
                     error_msg = ("ERROR: %s: '%s'"
                                  "<br><br>Operation failed !!!</br>"
                                  % (err.strerror, file_selected))
-                    error_popup(self._parent.mainWindow, error_msg)
+                    error_popup(self._parent.main_wndw, error_msg)
                 return
             tmp_text = self.mainEn.entry_get()
-                # FIXME: Why save twice?
+                # fixme: Why save twice?
             newfile.write(tmp_text)
             newfile.close()
                 # Suppress error message when empty file is saved
@@ -930,7 +930,7 @@ class ePadEntry(Box):
                 # if empty file entry.file_save destroys file :(
             if len(tmp_text):
                 self.mainEn.file_save()
-            self._parent.mainWindow.title_set(" %s - ePad" % os.path.basename(file_selected))
+            self._parent.main_wndw.title_set(" %s - ePad" % os.path.basename(file_selected))
             self.data["button"].text = " %s" % os.path.basename(file_selected)
 
             self.isSaved = True
@@ -1044,12 +1044,12 @@ class ePadFindBox(Box):
                 self._parent.tabbs.current.textEdited()
                 self._parent.tabbs.current.takeSnapShot()
             else:
-                error_popup(self._parent.mainWindow, "Text %s not found.\
-                           Nothing replaced."%search_string)
+                error_popup(self._parent.main_wndw, "Text %s not found.\
+                            Nothing replaced."%search_string)
             #else:
-            #    error_popup(self._parent.mainWindow, "No replacement string entered.")
+            #    error_popup(self._parent.main_wndw, "No replacement string entered.")
         else:
-            error_popup(self._parent.mainWindow, "No find string entered.")
+            error_popup(self._parent.main_wndw, "No find string entered.")
 
     def findPressed(self, obj):
         ''' search for next instance '''
@@ -1075,9 +1075,9 @@ class ePadFindBox(Box):
                 self._parent.tabbs.current.mainEn.select_region_set(self.currentFind,
                                                                     self.currentFind+search_length)
             else:
-                error_popup(self._parent.mainWindow, "Text %s not found."%search_string)
+                error_popup(self._parent.main_wndw, "Text %s not found."%search_string)
         else:
-            error_popup(self._parent.mainWindow, "No find string entered.")
+            error_popup(self._parent.main_wndw, "No find string entered.")
 
     def findAll(self, a_str, sub):
         ''' find all instances of search key '''
@@ -1230,44 +1230,44 @@ class ePadToolbar(Toolbar):
         # Update Config file
         self._parent.config['word_wrap'] = wordwrap
         self._parent.config['line_numbers'] = linenum
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def unDoPress(self, obj, it):
         ''' handler for undo pressed '''
         self._parent.tabbs.current.unDo()
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def reDoPress(self, obj, it):
         ''' handler for redo pressed '''
         self._parent.tabbs.current.reDo()
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def copyPress(self, obj, it):
         ''' handler for copy pressed '''
         self._parent.tabbs.current.mainEn.selection_copy()
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def itemClicked(self, obj, item):
         ''' dispatcher for button pressed '''
         if item.menu_get() is None and item.selected_get():
             item.selected_set(False)
         elif item.menu_get():
-            closeMenu(item, item.text_get())
+            close_menu(item, item.text_get())
 
     def pastePress(self, obj, it):
         ''' handler for paste pressed '''
         self._parent.tabbs.current.mainEn.selection_paste()
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def cutPress(self, obj, it):
         ''' handler for cut pressed '''
         self._parent.tabbs.current.mainEn.selection_cut()
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def selectAllPress(self, obj, it):
         ''' handler for select all pressed '''
         self._parent.tabbs.current.mainEn.select_all()
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
     def optionsNew(self, obj, it):
         ''' doesn't seem to do anything???! '''
@@ -1276,7 +1276,7 @@ class ePadToolbar(Toolbar):
             it.content.state = True
         else:
             it.content.state = False
-        resetCloseMenuCount(None)
+        reset_closemenu_count(None)
 
 
 class ePadConf(object):
