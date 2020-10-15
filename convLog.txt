@@ -3,7 +3,7 @@ epad conversion log
 current epad runs in Python2
 {open, save, save as, <edit>, new}
 
-2to3:
+------------------------------------------------------------------2to3
 rashkin@rrLaptop:~/BLPython/epad$ 2to3 -w epad
 RefactoringTool: Skipping optional fixer: buffer
 RefactoringTool: Skipping optional fixer: idioms
@@ -60,9 +60,10 @@ RefactoringTool: Skipping optional fixer: idioms
 RefactoringTool: Skipping optional fixer: set_literal
 RefactoringTool: Skipping optional fixer: ws_comma
 RefactoringTool: No files need to be modified.
-
+-------------------------------------------------run test
 rashkin@rrLaptop:~/BLPython/epad$ python3 epad
 Segmentation fault (core dumped) [not repeatable]
+-------------------------------------------------pylint3
 Next: add docstrings; check for long lines; 
 note: some of the long lines broke up lambdas...
          in fact, had to correct one of those to satisfy pylint
@@ -93,3 +94,5 @@ attribute, confirmPopup >> cnfrm_popup; some indentation
 attribute, mainWindow >> main_wndw; indentation
 attribute, mainBox >> main_box; indentation
 attribute, mainTb >> main_tb
+attribute, findBox >> find_box
+attribute, findVisible >> find_vsbl

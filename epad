@@ -244,8 +244,8 @@ class Interface(object):
                 self.main_box.pack_end(notifyBox)
                 notifyBox.show()
 
-        self.findBox = ePadFindBox(self, self.main_wndw)
-        self.findVisible = False
+        self.find_box = ePadFindBox(self, self.main_wndw)
+        self.find_vsbl = False
 
         self.tabbs = TabbedBox(self.main_wndw, size_hint_weight=EXPAND_BOTH,
                                size_hint_align=FILL_BOTH)
@@ -347,22 +347,22 @@ class Interface(object):
 
     def showFind(self, obj=None):
         ''' display find dialog '''
-        if not self.findVisible:
-            self.main_box.pack_before(self.findBox, self.tabbs)
-            self.findBox.findEntry.text = self.tabbs.current.mainEn.selection_get()
-            self.findBox.findEntry.focus_set(True)
-            self.findBox.findEntry.cursor_end_set()
-            self.findBox.show()
-            self.findVisible = True
+        if not self.find_vsbl:
+            self.main_box.pack_before(self.find_box, self.tabbs)
+            self.find_box.findEntry.text = self.tabbs.current.mainEn.selection_get()
+            self.find_box.findEntry.focus_set(True)
+            self.find_box.findEntry.cursor_end_set()
+            self.find_box.show()
+            self.find_vsbl = True
         else:
             self.hideFind()
 
     def hideFind(self, obj=None):
         ''' hide find dialog '''
-        if self.findVisible:
-            self.main_box.unpack(self.findBox)
-            self.findBox.hide()
-            self.findVisible = False
+        if self.find_vsbl:
+            self.main_box.unpack(self.find_box)
+            self.find_box.hide()
+            self.find_vsbl = False
 
     def saveAs(self):
         ''' handler for save file as new path/name '''
@@ -954,9 +954,9 @@ class ePadFindBox(Box):
         frameBox.horizontal = True
         frameBox.show()
 
-        findBox = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
-        findBox.text = "Find Text:"
-        findBox.show()
+        find_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        find_box.text = "Find Text:"
+        find_box.show()
 
         self.findEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
                                size_hint_align=FILL_HORIZ)
@@ -965,7 +965,7 @@ class ePadFindBox(Box):
         self.findEntry.callback_activated_add(self.findPressed)
         self.findEntry.show()
 
-        findBox.content = self.findEntry
+        find_box.content = self.findEntry
 
         replaceBox = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
         replaceBox.text = "Replace Text:"
@@ -979,7 +979,7 @@ class ePadFindBox(Box):
 
         replaceBox.content = self.replaceEntry
 
-        frameBox.pack_end(findBox)
+        frameBox.pack_end(find_box)
         frameBox.pack_end(replaceBox)
 
         buttonBox = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
