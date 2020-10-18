@@ -232,17 +232,17 @@ class Interface(object):
         if os.geteuid() == 0:
             # print_err("Caution: Root User")
             if self.config["notify_root"]:
-                notifyBox = Box(self.main_wndw, horizontal=True,
-                                size_hint_weight=EXPAND_HORIZ,
-                                size_hint_align=FILL_BOTH)
-                notifyLabel = Label(self.main_wndw, style="default/center",
-                                    size_hint_weight=EXPAND_HORIZ,
-                                    size_hint_align=FILL_BOTH)
-                notifyLabel.text = "<b><i>Root User</i></b>"
-                notifyBox.pack_end(notifyLabel)
-                notifyLabel.show()
-                self.main_box.pack_end(notifyBox)
-                notifyBox.show()
+                notify_box = Box(self.main_wndw, horizontal=True,
+                                 size_hint_weight=EXPAND_HORIZ,
+                                 size_hint_align=FILL_BOTH)
+                notify_lbl = Label(self.main_wndw, style="default/center",
+                                   size_hint_weight=EXPAND_HORIZ,
+                                   size_hint_align=FILL_BOTH)
+                notify_lbl.text = "<b><i>Root User</i></b>"
+                notify_box.pack_end(notify_lbl)
+                notify_lbl.show()
+                self.main_box.pack_end(notify_box)
+                notify_box.show()
 
         self.find_box = ePadFindBox(self, self.main_wndw)
         self.find_vsbl = False
@@ -257,36 +257,36 @@ class Interface(object):
         self.main_box.pack_end(self.tabbs)
 
         # Build our file selector for saving/loading files
-        self.fileBox = Box(self.main_wndw,
-                           size_hint_weight=EXPAND_BOTH,
-                           size_hint_align=FILL_BOTH)
-        self.fileBox.show()
+        self.file_box = Box(self.main_wndw,
+                            size_hint_weight=EXPAND_BOTH,
+                            size_hint_align=FILL_BOTH)
+        self.file_box.show()
 
-        self.fileLabel = Label(self.main_wndw,
-                               size_hint_weight=EXPAND_HORIZ,
-                               size_hint_align=FILL_BOTH, text="")
-        self.fileLabel.show()
-        self.lastDir = os.getenv("HOME")
-        self.fileSelector = FileSelector(self.main_wndw,
-                                         defaultPath=self.lastDir,
-                                         defaultPopulate=False,
-                                         size_hint_weight=EXPAND_BOTH,
-                                         size_hint_align=FILL_BOTH)
-        self.fileSelector.callback_activated_add(self.fileSelected)
-        self.fileSelector.callback_directory_open_add(self.updateLastDir)
-        self.fileSelector.callback_cancel_add(self.fileSelCancelPressed)
-        self.fileSelector.set_mode("Open")
-        self.fileSelector.show()
+        self.file_lbl = Label(self.main_wndw,
+                              size_hint_weight=EXPAND_HORIZ,
+                              size_hint_align=FILL_BOTH, text="")
+        self.file_lbl.show()
+        self.last_dir = os.getenv("HOME")
+        self.file_slctr = FileSelector(self.main_wndw,
+                                       defaultPath=self.last_dir,
+                                       defaultPopulate=False,
+                                       size_hint_weight=EXPAND_BOTH,
+                                       size_hint_align=FILL_BOTH)
+        self.file_slctr.callback_activated_add(self.fileSelected)
+        self.file_slctr.callback_directory_open_add(self.updateLastDir)
+        self.file_slctr.callback_cancel_add(self.fileSelCancelPressed)
+        self.file_slctr.set_mode("Open")
+        self.file_slctr.show()
 
-        self.fileBox.pack_end(self.fileLabel)
-        self.fileBox.pack_end(self.fileSelector)
+        self.file_box.pack_end(self.file_lbl)
+        self.file_box.pack_end(self.file_slctr)
 
         # Flip object has the file selector on one side
         #   and the GUI on the other
         self.flip = Flip(self.main_wndw, size_hint_weight=EXPAND_BOTH,
                          size_hint_align=FILL_BOTH)
         self.flip.part_content_set("front", self.main_box)
-        self.flip.part_content_set("back", self.fileBox)
+        self.flip.part_content_set("back", self.file_box)
         self.main_wndw.resize_object_add(self.flip)
         self.flip.show()
 
@@ -335,10 +335,10 @@ class Interface(object):
 
     def openFile(self, obj=None, ignoreSave=False):
         ''' open a new/different file '''
-        self.fileSelector.set_mode("Open")
-        self.fileLabel.text = "<b>Select a text file to open:</b>"
-        if self.fileSelector.filepath_en.text != self.lastDir:
-            self.fileSelector.populate_files(self.lastDir)
+        self.file_slctr.set_mode("Open")
+        self.file_lbl.text = "<b>Select a text file to open:</b>"
+        if self.file_slctr.filepath_en.text != self.last_dir:
+            self.file_slctr.populate_files(self.last_dir)
         self.flip.go(ELM_FLIP_ROTATE_YZ_CENTER_AXIS)
 
     def fileSelCancelPressed(self, fs):
@@ -366,10 +366,10 @@ class Interface(object):
 
     def saveAs(self):
         ''' handler for save file as new path/name '''
-        self.fileSelector.set_mode("Save")
-        self.fileLabel.text = "<b>Save new file to where:</b>"
-        if self.fileSelector.filepath_en.text != self.lastDir:
-            self.fileSelector.populate_files(self.lastDir)
+        self.file_slctr.set_mode("Save")
+        self.file_lbl.text = "<b>Save new file to where:</b>"
+        if self.file_slctr.filepath_en.text != self.last_dir:
+            self.file_slctr.populate_files(self.last_dir)
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
     def saveFile(self, obj=False):
@@ -413,7 +413,7 @@ class Interface(object):
             file_selected = markup_to_utf8(file_selected)
         if file_selected:
             #print("File Selected: {0}".format(file_selected))
-            self.lastDir = os.path.dirname(file_selected)
+            self.last_dir = os.path.dirname(file_selected)
             # This fails if file_selected does not exist yet
 
             fs.file_entry.text = file_selected.split("/")[-1]
@@ -440,7 +440,7 @@ class Interface(object):
 
     def updateLastDir(self, path):
         ''' actualize current path '''
-        self.lastDir = path
+        self.last_dir = path
 
     def showAbout(self):
         ''' display version info '''
@@ -532,7 +532,7 @@ class Interface(object):
                 self.openFile()
             elif event.keyname == "h":
                 if not self.flip.front_visible_get():
-                    self.fileSelector.toggleHidden()
+                    self.file_slctr.toggleHidden()
             elif event.keyname == "q":
                 self.closeChecks()
             elif event.keyname == "f":
@@ -568,7 +568,7 @@ class Interface(object):
                     error_popup(self.main_wndw, error_msg)
         if start and start[1]:
             if os.path.isdir(start[1]):
-                self.lastDir = start[1]
+                self.last_dir = start[1]
             else:
                 pass
 
@@ -893,7 +893,7 @@ class ePadEntry(Box):
         ''' deal with selected file '''
         # Something I should avoid but here I prefer a polymorphic function
         if isinstance(obj, Button):
-            file_selected = self._parent.fileSelector.selected_get()
+            file_selected = self._parent.file_slctr.selected_get()
         else:
             file_selected = obj
 
@@ -1441,6 +1441,6 @@ if __name__ == "__main__":
     else:
         GUI.launch([None, os.getcwd()])
     elementary.run()
-    GUI.fileSelector.shutdown()
+    GUI.file_slctr.shutdown()
     # Shutdown App
     elementary.shutdown()

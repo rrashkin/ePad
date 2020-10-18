@@ -96,3 +96,9 @@ attribute, mainBox >> main_box; indentation
 attribute, mainTb >> main_tb
 attribute, findBox >> find_box
 attribute, findVisible >> find_vsbl
+attribute, fileBox >> file_box
+attribute, fileLabel >> file_lbl --and save!!
+attribute, lastDir >> last_dir
+attribute, fileSelector >> file_slctr; indentation
+variable, notifyBox >> notify_box; indentation
+variable, notifyLabel >> notify_lbl; indentation
