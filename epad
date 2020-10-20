@@ -249,9 +249,9 @@ class Interface(object):
 
         self.tabbs = TabbedBox(self.main_wndw, size_hint_weight=EXPAND_BOTH,
                                size_hint_align=FILL_BOTH)
-        self.tabbs.closeCallback = self.closeFile
-        self.tabbs.emptyCallback = self.baseFile
-        self.tabbs.tabChangedCallback = self.tabChanged
+        self.tabbs.closeCallback = self.close_file
+        self.tabbs.emptyCallback = self.base_file
+        self.tabbs.tab_chngdCallback = self.tab_chngd
         self.tabbs.show()
 
         self.main_box.pack_end(self.tabbs)
@@ -290,12 +290,12 @@ class Interface(object):
         self.main_wndw.resize_object_add(self.flip)
         self.flip.show()
 
-    def tabChanged(self, tabbs, widget):
+    def tab_chngd(self, tabbs, widget):
         ''' handler for when focus changes tabs '''
         self.main_wndw.title = widget.data["button"].text
         self.main_tb.savebtn.disabled = not widget.dirty
 
-    def addFile(self, filePath):
+    def add_file(self, filePath):
         ''' add file to new tab '''
         entryBox = ePadEntry(self, self.tabbs)
         entryBox.show()
@@ -310,11 +310,11 @@ class Interface(object):
         self.tabbs.add(entryBox, tabName)
         entryBox.mainEn.focus_set(True)
 
-    def baseFile(self, tabbs):
+    def base_file(self, tabbs):
         '''This function gets called when all files are closed '''
-        self.addFile("Untitled")
+        self.add_file("Untitled")
 
-    def closeFile(self, tabbs, widget):
+    def close_file(self, tabbs, widget):
         ''' initiate checks to close file '''
         widget.closeChecks()
 
@@ -331,7 +331,7 @@ class Interface(object):
                       ecore.ECORE_EXE_PIPE_ERROR|
                       ecore.ECORE_EXE_PIPE_WRITE)
             return
-        self.addFile("Untitled")
+        self.add_file("Untitled")
 
     def openFile(self, obj=None, ignoreSave=False):
         ''' open a new/different file '''
@@ -436,7 +436,7 @@ class Interface(object):
                     self.tabbs.current.doSelected(file_selected)
                     return
             else:
-                self.addFile(file_selected)
+                self.add_file(file_selected)
 
     def updateLastDir(self, path):
         ''' actualize current path '''
@@ -561,7 +561,7 @@ class Interface(object):
                 if os.path.isdir(os.path.dirname(ourFile)):
                     if os.path.isfile(ourFile):
                         ##print(ourFile)
-                        self.addFile(ourFile)
+                        self.add_file(ourFile)
                 else:
                     error_msg = ("<b>'%s'</b> is an Invalid path."
                                  "<br><br>Open failed !!!" % (ourFile))
@@ -573,7 +573,7 @@ class Interface(object):
                 pass
 
         if not len(self.tabbs.tabs):
-            self.addFile("Untitled")
+            self.add_file("Untitled")
 
         self.main_wndw.show()
 

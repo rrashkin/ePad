@@ -102,3 +102,10 @@ attribute, lastDir >> last_dir
 attribute, fileSelector >> file_slctr; indentation
 variable, notifyBox >> notify_box; indentation
 variable, notifyLabel >> notify_lbl; indentation
+method, tabChanged >> tab_chngd
+method, addFile >> add_file
+method, baseFile >> base_file
+method, closeFile >> close_file
+method, showFile >> show_file  [??unused??]
+method, newFile >> new_file
+method, openFile >> open_file
