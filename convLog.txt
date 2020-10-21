@@ -114,3 +114,6 @@ method, showFind >> show_find
 method, hideFind >> hide_find
 method, saveAs >> save_as
 method, saveFile >> save_file
+method fileSelected >> file_slctd
+method, updateLastDir >> upd_lastdir
+method, showAbout >> shw_about

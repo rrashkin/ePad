@@ -272,8 +272,8 @@ class Interface(object):
                                        defaultPopulate=False,
                                        size_hint_weight=EXPAND_BOTH,
                                        size_hint_align=FILL_BOTH)
-        self.file_slctr.callback_activated_add(self.fileSelected)
-        self.file_slctr.callback_directory_open_add(self.updateLastDir)
+        self.file_slctr.callback_activated_add(self.file_slctd)
+        self.file_slctr.callback_directory_open_add(self.upd_lastdir)
         self.file_slctr.callback_cancel_add(self.fileselcncl_pressed)
         self.file_slctr.set_mode("Open")
         self.file_slctr.show()
@@ -404,7 +404,7 @@ class Interface(object):
                 self.tabbs.current.setDirty(False)
                 self.tabbs.current.isSaved = True
 
-    def fileSelected(self, fs, file_selected, onStartup=False):
+    def file_slctd(self, fs, file_selected, onStartup=False):
         ''' function identifies selected file '''
         if not onStartup:
             self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
@@ -438,11 +438,11 @@ class Interface(object):
             else:
                 self.add_file(file_selected)
 
-    def updateLastDir(self, path):
+    def upd_lastdir(self, path):
         ''' actualize current path '''
         self.last_dir = path
 
-    def showAbout(self):
+    def shw_about(self):
         ''' display version info '''
         self.about.launch()
 
@@ -1168,9 +1168,9 @@ class ePadToolbar(Toolbar):
         # ---------------------------
 
         self.item_append("dialog-information", "About",
-                         self.showAbout)
+                         self.shw_about)
 
-    def showAbout(self, obj, it):
+    def shw_about(self, obj, it):
         ''' display version information '''
         try:
             AboutWindow(self, title="ePad", standardicon="accessories-text-editor", \
