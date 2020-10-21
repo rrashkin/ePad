@@ -274,7 +274,7 @@ class Interface(object):
                                        size_hint_align=FILL_BOTH)
         self.file_slctr.callback_activated_add(self.fileSelected)
         self.file_slctr.callback_directory_open_add(self.updateLastDir)
-        self.file_slctr.callback_cancel_add(self.fileSelCancelPressed)
+        self.file_slctr.callback_cancel_add(self.fileselcncl_pressed)
         self.file_slctr.set_mode("Open")
         self.file_slctr.show()
 
@@ -301,7 +301,7 @@ class Interface(object):
         entryBox.show()
 
         if filePath != "Untitled":
-            entryBox.openFile(filePath)
+            entryBox.open_file(filePath)
             tabName = filePath.split("/")[-1]
         else:
             tabName = "Untitled"
@@ -318,12 +318,12 @@ class Interface(object):
         ''' initiate checks to close file '''
         widget.closeChecks()
 
-    def showFile(self, btn):
+    def show_file(self, btn):
         ''' ??? display file ??? '''
         if self.tabbs.current != btn.data["entry"]:
             self.setFile(btn.data["entry"], btn.text)
 
-    def newFile(self, obj=None, ignoreSave=False):
+    def new_file(self, obj=None, ignoreSave=False):
         ''' blank tab for new file '''
         if self.config["new_instance"]:
             print("Launching new instance")
@@ -333,7 +333,7 @@ class Interface(object):
             return
         self.add_file("Untitled")
 
-    def openFile(self, obj=None, ignoreSave=False):
+    def open_file(self, obj=None, ignoreSave=False):
         ''' open a new/different file '''
         self.file_slctr.set_mode("Open")
         self.file_lbl.text = "<b>Select a text file to open:</b>"
@@ -341,11 +341,11 @@ class Interface(object):
             self.file_slctr.populate_files(self.last_dir)
         self.flip.go(ELM_FLIP_ROTATE_YZ_CENTER_AXIS)
 
-    def fileSelCancelPressed(self, fs):
+    def fileselcncl_pressed(self, fs):
         ''' cancel file selection '''
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
-    def showFind(self, obj=None):
+    def show_find(self, obj=None):
         ''' display find dialog '''
         if not self.find_vsbl:
             self.main_box.pack_before(self.find_box, self.tabbs)
@@ -355,16 +355,16 @@ class Interface(object):
             self.find_box.show()
             self.find_vsbl = True
         else:
-            self.hideFind()
+            self.hide_find()
 
-    def hideFind(self, obj=None):
+    def hide_find(self, obj=None):
         ''' hide find dialog '''
         if self.find_vsbl:
             self.main_box.unpack(self.find_box)
             self.find_box.hide()
             self.find_vsbl = False
 
-    def saveAs(self):
+    def save_as(self):
         ''' handler for save file as new path/name '''
         self.file_slctr.set_mode("Save")
         self.file_lbl.text = "<b>Save new file to where:</b>"
@@ -372,10 +372,10 @@ class Interface(object):
             self.file_slctr.populate_files(self.last_dir)
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
-    def saveFile(self, obj=False):
+    def save_file(self, obj=False):
         ''' handler for save file '''
         if self.tabbs.current.mainEn.file_get()[0] is None or self.tabbs.current.isNewFile:
-            self.saveAs()
+            self.save_as()
         else:
             if not self.tabbs.current.isSaved:
                 file_selected = self.tabbs.current.mainEn.file_get()[0]
@@ -518,25 +518,25 @@ class Interface(object):
 
         if event.modifier_is_set("Control"):
             if event.keyname == "n":
-                #newFile(self.newFile)
-                self.newFile()
+                #new_file(self.new_file)
+                self.new_file()
             elif event.keyname == "s" and event.modifier_is_set("Shift"):
-                self.saveAs()
+                self.save_as()
             elif event.keyname == "s":
-                self.saveFile()
+                self.save_file()
             elif event.keyname == "z" and event.modifier_is_set("Shift"):
                 self.tabbs.current.reDo()
             elif event.keyname == "z":
                 self.tabbs.current.unDo()
             elif event.keyname == "o":
-                self.openFile()
+                self.open_file()
             elif event.keyname == "h":
                 if not self.flip.front_visible_get():
                     self.file_slctr.toggleHidden()
             elif event.keyname == "q":
                 self.closeChecks()
             elif event.keyname == "f":
-                self.showFind()
+                self.show_find()
         elif isinstance(src, Entry) and event.key in ["space", "BackSpace", "Return"]:
             self.tabbs.current.takeSnapShot()
 
@@ -787,7 +787,7 @@ class ePadEntry(Box):
             self.setDirty(True)
         self.isSaved = False
 
-    def openFile(self, filePath):
+    def open_file(self, filePath):
         ''' open existing file '''
         try:
             self.mainEn.file_set(filePath, ELM_TEXT_FORMAT_PLAIN_UTF8)
@@ -830,7 +830,7 @@ class ePadEntry(Box):
         # Save the file and then close button
         sav_btt = Button(self._parent.main_wndw)
         sav_btt.text = "Yes"
-        sav_btt.callback_clicked_add(self._parent.saveFile)
+        sav_btt.callback_clicked_add(self._parent.save_file)
         sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
         sav_btt.show()
 
@@ -998,7 +998,7 @@ class ePadFindBox(Box):
 
         closeButton = Button(self._canvas)
         closeButton.text = "Done"
-        closeButton.callback_pressed_add(self._parent.showFind)
+        closeButton.callback_pressed_add(self._parent.show_find)
         closeButton.show()
 
         self.caseCheck = Check(self._canvas, text="Case Sensitive")
@@ -1110,15 +1110,15 @@ class ePadToolbar(Toolbar):
         self.menu_parent = canvas
 
         self.item_append("document-new", "New",
-                         lambda self, obj: self._parent.newFile())
+                         lambda self, obj: self._parent.new_file())
         self.item_append("document-open", "Open",
-                         lambda self, obj: self._parent.openFile())
+                         lambda self, obj: self._parent.open_file())
         self.savebtn = self.item_append("document-save", "Save",
                                         lambda self,
-                                               obj: self._parent.saveFile())
+                                               obj: self._parent.save_file())
         self.savebtn.disabled = True
         self.item_append("document-save-as", "Save As",
-                         lambda self, obj: self._parent.saveAs())
+                         lambda self, obj: self._parent.save_as())
         # -- Edit Dropdown Menu --
         tb_it = self.item_append("edit-copy", "Edit")
         tb_it.menu = True
@@ -1134,7 +1134,7 @@ class ePadToolbar(Toolbar):
                       self.selectAllPress)
 
         self.item_append("edit-find-replace", "Find",
-                         lambda self, obj: self._parent.showFind())
+                         lambda self, obj: self._parent.show_find())
         # -----------------------
         #
         # -- Options Dropdown Menu --

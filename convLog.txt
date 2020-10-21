@@ -109,3 +109,8 @@ method, closeFile >> close_file
 method, showFile >> show_file  [??unused??]
 method, newFile >> new_file
 method, openFile >> open_file
+method, fileSelCancelPressed >> fileselcncl_pressed
+method, showFind >> show_find
+method, hideFind >> hide_find
+method, saveAs >> save_as
+method, saveFile >> save_file
