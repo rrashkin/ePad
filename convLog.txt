@@ -122,3 +122,13 @@ method, closeChecks >> close_chks
 method, closePopup >> close_popup
 method, unsavedWorkPopup >> unsvdwrk_popup
 method, eventsCb >> evnts_cb
+argument, filePath >> file_path
+variable, entryBox >> entry_box
+variable, tabName >> tab_name
+argument ignoreSave >> ignore_save
+    def fileselcncl_pressed(self): >> removed "fs" argument
+argument, fs >> _fs
+constant, ourFiles >> OUR_FILES
+class, ePadConf >> EpadConf
+replaced if ... with var=bool
+and then removed commented if block
