@@ -117,3 +117,8 @@ method, saveFile >> save_file
 method fileSelected >> file_slctd
 method, updateLastDir >> upd_lastdir
 method, showAbout >> shw_about
+method, closeApp >> close_app
+method, closeChecks >> close_chks
+method, closePopup >> close_popup
+method, unsavedWorkPopup >> unsvdwrk_popup
+method, eventsCb >> evnts_cb

@@ -1,0 +1,2 @@
+It appears that if you close a "dirty tab" - one that has unsaved edits - with the tab's "x", you don't get warned.
+If you close from the "application close", you do.

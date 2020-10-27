@@ -206,8 +206,8 @@ class Interface(object):
 
         self.main_wndw = StandardWindow("epad", "Untitled - ePad",
                                         size=(600, 400))
-        self.main_wndw.callback_delete_request_add(self.closeChecks)
-        self.main_wndw.elm_event_callback_add(self.eventsCb)
+        self.main_wndw.callback_delete_request_add(self.close_chks)
+        self.main_wndw.elm_event_callback_add(self.evnts_cb)
         #self.main_wndw.repeat_events_set(False)
 
         icon = Icon(self.main_wndw,
@@ -316,7 +316,7 @@ class Interface(object):
 
     def close_file(self, tabbs, widget):
         ''' initiate checks to close file '''
-        widget.closeChecks()
+        widget.close_chks()
 
     def show_file(self, btn):
         ''' ??? display file ??? '''
@@ -446,11 +446,11 @@ class Interface(object):
         ''' display version info '''
         self.about.launch()
 
-    def closeApp(self, obj=False, trash=False):
+    def close_app(self, obj=False, trash=False):
         ''' close application '''
         elementary.exit()
 
-    def closeChecks(self, obj=False):
+    def close_chks(self, obj=False):
         ''' check status is ok to close '''
         allSaved = True
 
@@ -459,16 +459,16 @@ class Interface(object):
                 allSaved = False
 
         if allSaved:
-            self.closeApp()
+            self.close_app()
         else:
-            self.unsavedWorkPopup()
+            self.unsvdwrk_popup()
 
-    def closePopup(self, bt, cnfrm_popup):
+    def close_popup(self, bt, cnfrm_popup):
         ''' close are-you-sure? popup '''
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
 
-    def unsavedWorkPopup(self):
+    def unsvdwrk_popup(self):
         ''' warn unsaved changes '''
         if self.cnfrm_popup:
             return
@@ -498,12 +498,12 @@ class Interface(object):
         # Close without saving button
         no_btt = Button(self.main_wndw)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         no_btt.show()
         # Save the file and then close button
         sav_btt = Button(self.main_wndw)
         sav_btt.text = "Yes"
-        sav_btt.callback_clicked_add(self.closeApp)
+        sav_btt.callback_clicked_add(self.close_app)
         sav_btt.show()
 
         # add buttons to popup
@@ -511,7 +511,7 @@ class Interface(object):
         self.cnfrm_popup.part_content_set("button3", sav_btt)
         self.cnfrm_popup.show()
 
-    def eventsCb(self, obj, src, event_type, event):
+    def evnts_cb(self, obj, src, event_type, event):
         ''' callback to process button press events '''
         if not event_type == EVAS_CALLBACK_KEY_UP:
             return False
@@ -534,7 +534,7 @@ class Interface(object):
                 if not self.flip.front_visible_get():
                     self.file_slctr.toggleHidden()
             elif event.keyname == "q":
-                self.closeChecks()
+                self.close_chks()
             elif event.keyname == "f":
                 self.show_find()
         elif isinstance(src, Entry) and event.key in ["space", "BackSpace", "Return"]:
@@ -800,7 +800,7 @@ class ePadEntry(Box):
         self.takeSnapShot()
         self.mainEn.focus_set(True)
 
-    def closeChecks(self, ourCallback=None):
+    def close_chks(self, ourCallback=None):
         ''' close file checklist '''
         if not self.isSaved:
             self.confirmSave()
@@ -819,19 +819,19 @@ class ePadEntry(Box):
         # Close without saving button
         no_btt = Button(self._parent.main_wndw)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         no_btt.callback_clicked_add(lambda o: self._parent.tabbs.deleteTab(self))
         no_btt.show()
         # cancel close request
         cancel_btt = Button(self._parent.main_wndw)
         cancel_btt.text = "Cancel"
-        cancel_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        cancel_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         cancel_btt.show()
         # Save the file and then close button
         sav_btt = Button(self._parent.main_wndw)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self._parent.save_file)
-        sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        sav_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         sav_btt.show()
 
         # add buttons to popup
@@ -840,7 +840,7 @@ class ePadEntry(Box):
         self.cnfrm_popup.part_content_set("button3", sav_btt)
         self.cnfrm_popup.show()
 
-    def closePopup(self, bt, cnfrm_popup):
+    def close_popup(self, bt, cnfrm_popup):
         ''' close popup '''
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
@@ -875,13 +875,13 @@ class ePadEntry(Box):
         # Close without saving button
         no_btt = Button(self._parent.main_wndw)
         no_btt.text = "No"
-        no_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         no_btt.show()
         # Save the file and then close button
         sav_btt = Button(self._parent.main_wndw)
         sav_btt.text = "Yes"
         sav_btt.callback_clicked_add(self.doSelected)
-        sav_btt.callback_clicked_add(self.closePopup, self.cnfrm_popup)
+        sav_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         sav_btt.show()
 
         # add buttons to popup
