@@ -132,3 +132,17 @@ constant, ourFiles >> OUR_FILES
 class, ePadConf >> EpadConf
 replaced if ... with var=bool
 and then removed commented if block
+grouped urllib imports
+removed duplicate "show_hidden" member of "default" map in epadConf()
+argument, it >> _it
+method optionsNew >> options_new
+removed unused argument, it, in selectAllPress()
+method, selectAllPress >> slctall_press
+method, cutPress >> cut_press
+method, pastePress >> paste_press
+removed unused argument, it, from cut_press and paste_press
+method, itemClicked >> item_clicked
+method, copyPress >> copy_press
+method, reDoPress >> redo_press
+method, unDoPress >> undo_press
+removed unused argument, it, from copy_press, redo_press, undo_press

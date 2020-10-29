@@ -1,0 +1,2 @@
+Enhancement: 
+When a new tab is opened, the cursor should be in it so you can start typing.

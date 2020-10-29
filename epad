@@ -22,12 +22,11 @@
 import errno
 import sys
 import os
-import urllib.parse
-import urllib.error
 import io
 import json
 from collections import Mapping
-
+import urllib.parse
+import urllib.error
 try:
     # Python3
     import urllib.request
@@ -1105,7 +1104,7 @@ class ePadToolbar(Toolbar):
         self.size_hint_align = (EVAS_HINT_FILL, 0.0)
         self.select_mode = ELM_OBJECT_SELECT_MODE_DEFAULT
         self.icon_size_set(16)
-        self.callback_selected_add(self.itemClicked)
+        self.callback_selected_add(self.item_clicked)
 
         self.menu_parent = canvas
 
@@ -1123,15 +1122,15 @@ class ePadToolbar(Toolbar):
         tb_it = self.item_append("edit-copy", "Edit")
         tb_it.menu = True
         menu = tb_it.menu
-        menu.item_add(None, "Undo", "edit-undo", self.unDoPress)
-        menu.item_add(None, "Redo", "edit-redo", self.reDoPress)
+        menu.item_add(None, "Undo", "edit-undo", self.undo_press)
+        menu.item_add(None, "Redo", "edit-redo", self.redo_press)
         menu.item_separator_add()
-        menu.item_add(None, "Copy", "edit-copy", self.copyPress)
-        menu.item_add(None, "Paste", "edit-paste", self.pastePress)
-        menu.item_add(None, "Cut", "edit-cut", self.cutPress)
+        menu.item_add(None, "Copy", "edit-copy", self.copy_press)
+        menu.item_add(None, "Paste", "edit-paste", self.paste_press)
+        menu.item_add(None, "Cut", "edit-cut", self.cut_press)
         menu.item_separator_add()
         menu.item_add(None, "Select All", "edit-select-all",
-                      self.selectAllPress)
+                      self.slctall_press)
 
         self.item_append("edit-find-replace", "Find",
                          lambda self, obj: self._parent.show_find())
@@ -1157,7 +1156,7 @@ class ePadToolbar(Toolbar):
         self.menu_item_ln = it
 
 
-        '''it = menu.item_add(None, "New Instance", None, self.optionsNew)
+        '''it = menu.item_add(None, "New Instance", None, self.options_new)
         chk = Check(canvas, disabled=True)
         it.content = chk
         if self._parent.newInstance:
@@ -1232,49 +1231,48 @@ class ePadToolbar(Toolbar):
         self._parent.config['line_numbers'] = linenum
         reset_closemenu_count(None)
 
-    def unDoPress(self, obj, it):
+    def undo_press(self, obj):
         ''' handler for undo pressed '''
         self._parent.tabbs.current.unDo()
         reset_closemenu_count(None)
 
-    def reDoPress(self, obj, it):
+    def redo_press(self, obj):
         ''' handler for redo pressed '''
         self._parent.tabbs.current.reDo()
         reset_closemenu_count(None)
 
-    def copyPress(self, obj, it):
+    def copy_press(self, obj):
         ''' handler for copy pressed '''
         self._parent.tabbs.current.mainEn.selection_copy()
         reset_closemenu_count(None)
 
-    def itemClicked(self, obj, item):
+    def item_clicked(self, obj, item):
         ''' dispatcher for button pressed '''
         if item.menu_get() is None and item.selected_get():
             item.selected_set(False)
         elif item.menu_get():
             close_menu(item, item.text_get())
 
-    def pastePress(self, obj, it):
+    def paste_press(self, obj):
         ''' handler for paste pressed '''
         self._parent.tabbs.current.mainEn.selection_paste()
         reset_closemenu_count(None)
 
-    def cutPress(self, obj, it):
+    def cut_press(self, obj):
         ''' handler for cut pressed '''
         self._parent.tabbs.current.mainEn.selection_cut()
         reset_closemenu_count(None)
 
-    def selectAllPress(self, obj, it):
+    def slctall_press(self, obj):
         ''' handler for select all pressed '''
         self._parent.tabbs.current.mainEn.select_all()
         reset_closemenu_count(None)
 
-    def optionsNew(self, obj, it):
+    def options_new(self, obj, _it):
         ''' doesn't seem to do anything???! '''
         self._parent.newInstance = not self._parent.newInstance
-        it.content.state = self._parent.newInstance
+        _it.content.state = self._parent.newInstance
         reset_closemenu_count(None)
-
 
 class EpadConf(object):
     """
@@ -1303,7 +1301,6 @@ class EpadConf(object):
                "case_sensitive": False,
                "notify_root": True,
                "new_instance": False,
-               "show_hidden": False,
                "autosave": False}
 
     def __init__(self):
