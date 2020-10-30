@@ -43,7 +43,6 @@ from efl.elementary.box import Box
 from efl.elementary.button import Button
 from efl.elementary.label import Label, ELM_WRAP_WORD
 from efl.elementary.icon import Icon
-from efl.elementary.notify import Notify, ELM_NOTIFY_ALIGN_FILL
 from efl.elementary.separator import Separator
 from efl.elementary.scroller import Scroller
 from efl.elementary.frame import Frame
@@ -53,15 +52,12 @@ from efl.elementary.entry import Entry, ELM_TEXT_FORMAT_PLAIN_UTF8,\
 from efl.elementary.popup import Popup
 from efl.elementary.toolbar import Toolbar, ELM_OBJECT_SELECT_MODE_DEFAULT
 from efl.elementary.flip import Flip, ELM_FLIP_ROTATE_XZ_CENTER_AXIS,\
-                                ELM_FLIP_ROTATE_YZ_CENTER_AXIS,\
-                                ELM_FLIP_INTERACTION_ROTATE
+                                ELM_FLIP_ROTATE_YZ_CENTER_AXIS
 from efl.elementary.table import Table
 from efl.elementary.check import Check
-from efl.elementary.naviframe import Naviframe
 
 # Imported here to stop class resolver complaining when an input event
 # applies to an internal layout object
-from efl.elementary.layout import Layout
 
 from elmextensions import AboutWindow, InstanceError
 from elmextensions import FileSelector
@@ -1143,26 +1139,26 @@ class ePadToolbar(Toolbar):
         tb_it.menu = True
         menu = tb_it.menu
         self._parent.wordwrap = self._parent.config['word_wrap']
-        it = menu.item_add(None, "Wordwrap", None, self.optionsToggle)
+        _it = menu.item_add(None, "Wordwrap", None, self.optionsToggle)
         chk = Check(canvas)
-        it.content = chk
-        it.content.state = (self._parent.config['word_wrap'] == ELM_WRAP_MIXED)
-        self.menu_item_ww = it
+        _it.content = chk
+        _it.content.state = (self._parent.config['word_wrap'] == ELM_WRAP_MIXED)
+        self.menu_item_ww = _it
 
-        it = menu.item_add(None, "Line Numbers", None, self.optionsToggle)
+        _it = menu.item_add(None, "Line Numbers", None, self.optionsToggle)
         chk = Check(canvas)
-        it.content = chk
-        it.content.state = self._parent.config['line_numbers']
-        self.menu_item_ln = it
+        _it.content = chk
+        _it.content.state = self._parent.config['line_numbers']
+        self.menu_item_ln = _it
 
 
-        '''it = menu.item_add(None, "New Instance", None, self.options_new)
+        '''_it = menu.item_add(None, "New Instance", None, self.options_new)
         chk = Check(canvas, disabled=True)
-        it.content = chk
+        _it.content = chk
         if self._parent.newInstance:
-            it.content.state = True
+            _it.content.state = True
         else:
-            it.content.state = False'''
+            _it.content.state = False'''
 
         # ---------------------------
 
@@ -1182,27 +1178,27 @@ class ePadToolbar(Toolbar):
     #############################################################
     # Hack to toogle word wrap state with line numbers state   ##
     #############################################################
-    def optionsToggle(self, obj, it):
+    def optionsToggle(self, obj, _it):
         ''' toggle wordwrap/linenumbers '''
         wordwrap = self._parent.config['word_wrap']
         linenum = self._parent.config['line_numbers']
 
-        if it.text == "Wordwrap":
+        if _it.text == "Wordwrap":
             if wordwrap == ELM_WRAP_MIXED:
                 wordwrap = ELM_WRAP_NONE
-                it.content.state = False
+                _it.content.state = False
                 linenum = self.menu_item_ln.content.state = True
             else:
                 wordwrap = ELM_WRAP_MIXED
-                it.content.state = True
+                _it.content.state = True
                 linenum = self.menu_item_ln.content.state = False
         else:
             if linenum:
-                linenum = it.content.state = False
+                linenum = _it.content.state = False
                 wordwrap = ELM_WRAP_MIXED
                 self.menu_item_ww.content.state = True
             else:
-                linenum = it.content.state = True
+                linenum = _it.content.state = True
                 wordwrap = ELM_WRAP_NONE
                 self.menu_item_ww.content.state = False
         # Change word wrap state of all open tabs

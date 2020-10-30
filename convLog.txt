@@ -146,3 +146,12 @@ method, copyPress >> copy_press
 method, reDoPress >> redo_press
 method, unDoPress >> undo_press
 removed unused argument, it, from copy_press, redo_press, undo_press
+removed unused import: from efl.elementary.notify import Notify
+removed unused import: from efl.elementary.notify import ELM_NOTIFY_ALIGN_FILL
+removed unused import: from efl.elementary.flip import ELM_FLIP_INTERACTION_ROTATE
+removed unused import: from efl.elementary.naviframe import Naviframe
+removed unused import: from efl.elementary.layout import Layout
+made item_clicked from method>>function -- removed self
+>>> then undid above since it resulted in wrong number of arguments to efl/evas/....
+argument, it >> _it
+more argument, it >> _it
