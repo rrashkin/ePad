@@ -217,7 +217,7 @@ class Interface(object):
                             size_hint_align=FILL_BOTH)
         self.main_box.show()
 
-        self.main_tb = ePadToolbar(self, self.main_wndw)
+        self.main_tb = EpadToolbar(self, self.main_wndw)
         self.main_tb.focus_allow = False
         self.main_tb.show()
 
@@ -336,7 +336,7 @@ class Interface(object):
             self.file_slctr.populate_files(self.last_dir)
         self.flip.go(ELM_FLIP_ROTATE_YZ_CENTER_AXIS)
 
-    def fileselcncl_pressed(self):
+    def fileselcncl_pressed(self, obj):
         ''' cancel file selection '''
         self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
 
@@ -998,7 +998,7 @@ class ePadFindBox(Box):
 
         self.caseCheck = Check(self._canvas, text="Case Sensitive")
         self.caseCheck.state_set(self._parent.config['case_sensitive'])
-        self.caseCheck.callback_changed_add(self.caseUpdate)
+        self.caseCheck.callback_changed_add(self.case_updt)
         self.caseCheck.show()
 
         buttonBox.pack_end(self.caseCheck)
@@ -1014,10 +1014,10 @@ class ePadFindBox(Box):
         tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get())
         if not self.caseCheck.state_get():
             search_string = self.findEntry.text.lower()
-            locations = list(self.findAll(tmp_text.lower(), search_string))
+            locations = list(self.find_all(tmp_text.lower(), search_string))
         else:
             search_string = self.findEntry.text
-            locations = list(self.findAll(tmp_text, search_string))
+            locations = list(self.find_all(tmp_text, search_string))
         search_length = len(search_string)
         if search_length:
             replace_string = self.replaceEntry.text
@@ -1056,15 +1056,15 @@ class ePadFindBox(Box):
             tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get())
         search_length = len(search_string)
         if search_length:
-            locations = list(self.findAll(tmp_text, search_string))
+            locations = list(self.find_all(tmp_text, search_string))
             if len(locations):
                 if self.currentFind == None or search_string != self.lastSearch:
                     self.lastSearch = search_string
                     self.currentFind = locations[0]
                 else:
-                    lastFind = locations.index(self.currentFind)
-                    if lastFind < len(locations)-1:
-                        self.currentFind = locations[lastFind+1]
+                    last_find = locations.index(self.currentFind)
+                    if last_find < len(locations)-1:
+                        self.currentFind = locations[last_find+1]
                     else:
                         self.currentFind = locations[0]
                 self._parent.tabbs.current.mainEn.select_region_set(self.currentFind,
@@ -1074,21 +1074,22 @@ class ePadFindBox(Box):
         else:
             error_popup(self._parent.main_wndw, "No find string entered.")
 
-    def findAll(self, a_str, sub):
+    def find_all(self, a_str, sub):
         ''' find all instances of search key '''
         start = 0
         while True:
             start = a_str.find(sub, start)
-            if start == -1: return
+            if start == -1:
+                return
             yield start
             start += len(sub) + 1
 
-    def caseUpdate(self, ck):
+    def case_updt(self, _ck):
         ''' if case sensitive or not '''
-        self._parent.config['case_sensitive'] = ck.state_get()
+        self._parent.config['case_sensitive'] = _ck.state_get()
 
 
-class ePadToolbar(Toolbar):
+class EpadToolbar(Toolbar):
     ''' application toolbar '''
     def __init__(self, parent, canvas):
         Toolbar.__init__(self, canvas)
@@ -1139,13 +1140,13 @@ class ePadToolbar(Toolbar):
         tb_it.menu = True
         menu = tb_it.menu
         self._parent.wordwrap = self._parent.config['word_wrap']
-        _it = menu.item_add(None, "Wordwrap", None, self.optionsToggle)
+        _it = menu.item_add(None, "Wordwrap", None, self.optns_toggle)
         chk = Check(canvas)
         _it.content = chk
         _it.content.state = (self._parent.config['word_wrap'] == ELM_WRAP_MIXED)
         self.menu_item_ww = _it
 
-        _it = menu.item_add(None, "Line Numbers", None, self.optionsToggle)
+        _it = menu.item_add(None, "Line Numbers", None, self.optns_toggle)
         chk = Check(canvas)
         _it.content = chk
         _it.content.state = self._parent.config['line_numbers']
@@ -1165,7 +1166,7 @@ class ePadToolbar(Toolbar):
         self.item_append("dialog-information", "About",
                          self.shw_about)
 
-    def shw_about(self, obj, it):
+    def shw_about(self, obj):
         ''' display version information '''
         try:
             AboutWindow(self, title="ePad", standardicon="accessories-text-editor", \
@@ -1178,7 +1179,7 @@ class ePadToolbar(Toolbar):
     #############################################################
     # Hack to toogle word wrap state with line numbers state   ##
     #############################################################
-    def optionsToggle(self, obj, _it):
+    def optns_toggle(self, obj, _it):
         ''' toggle wordwrap/linenumbers '''
         wordwrap = self._parent.config['word_wrap']
         linenum = self._parent.config['line_numbers']

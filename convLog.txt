@@ -155,3 +155,13 @@ made item_clicked from method>>function -- removed self
 >>> then undid above since it resulted in wrong number of arguments to efl/evas/....
 argument, it >> _it
 more argument, it >> _it
+removed unused argument it from shw_about()
+changed class ePadToolbar >> EpadToolbar
+method, optionsToggle >> optns_toggle
+argument, ck >> _ck
+method, caseUpdate >> case_updt
+made if ... : return into if ... : <linefeed> <indent> return
+to fix:  fileselcncl_pressed() takes 1 positional argument but 2 were given
+    	>>>added argument obj.
+method, findAll >> find_all
+method, lastFind >> last_find
