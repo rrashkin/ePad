@@ -677,17 +677,17 @@ class ePadEntry(Box):
             for i in range(self.doSpot+1, len(self.doArchive)):
                 self.doArchive.pop(self.doSpot+1)
 
-        curPos = self.mainEn.cursor_pos_get()
+        cur_pos = self.mainEn.cursor_pos_get()
         entryGet = self.mainEn.entry_get()
 
         if self.doSpot == 0:
-            self.saveSnapShot(curPos, entryGet)
+            self.saveSnapShot(cur_pos, entryGet)
         elif entryGet != self.doArchive[self.doSpot][1]:
-            self.saveSnapShot(curPos, entryGet)
+            self.saveSnapShot(cur_pos, entryGet)
 
-    def saveSnapShot(self, curPos, entryGet):
+    def saveSnapShot(self, cur_pos, entryGet):
         ''' save current state '''
-        self.doArchive.append([curPos, entryGet])
+        self.doArchive.append([cur_pos, entryGet])
 
         if len(self.doArchive) > 30:
             self.doArchive.pop(0)
@@ -945,9 +945,9 @@ class ePadFindBox(Box):
         self.currentFind = None
         self.lastSearch = None
 
-        frameBox = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
-        frameBox.horizontal = True
-        frameBox.show()
+        frame_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        frame_box.horizontal = True
+        frame_box.show()
 
         find_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
         find_box.text = "Find Text:"
@@ -957,14 +957,14 @@ class ePadFindBox(Box):
                                size_hint_align=FILL_HORIZ)
         self.findEntry.single_line_set(True)
         self.findEntry.scrollable_set(True)
-        self.findEntry.callback_activated_add(self.findPressed)
+        self.findEntry.callback_activated_add(self.find_pressed)
         self.findEntry.show()
 
         find_box.content = self.findEntry
 
-        replaceBox = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
-        replaceBox.text = "Replace Text:"
-        replaceBox.show()
+        repl_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        repl_box.text = "Replace Text:"
+        repl_box.show()
 
         self.replaceEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
                                   size_hint_align=FILL_HORIZ)
@@ -972,44 +972,44 @@ class ePadFindBox(Box):
         self.replaceEntry.scrollable_set(True)
         self.replaceEntry.show()
 
-        replaceBox.content = self.replaceEntry
+        repl_box.content = self.replaceEntry
 
-        frameBox.pack_end(find_box)
-        frameBox.pack_end(replaceBox)
+        frame_box.pack_end(find_box)
+        frame_box.pack_end(repl_box)
 
-        buttonBox = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
-        buttonBox.horizontal = True
-        buttonBox.show()
+        btn_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        btn_box.horizontal = True
+        btn_box.show()
 
-        findButton = Button(self._canvas)
-        findButton.text = "Find Next"
-        findButton.callback_pressed_add(self.findPressed)
-        findButton.show()
+        find_btn = Button(self._canvas)
+        find_btn.text = "Find Next"
+        find_btn.callback_pressed_add(self.find_pressed)
+        find_btn.show()
 
-        replaceButton = Button(self._canvas)
-        replaceButton.text = "Replace All"
-        replaceButton.callback_pressed_add(self.replacePressed)
-        replaceButton.show()
+        repl_btn = Button(self._canvas)
+        repl_btn.text = "Replace All"
+        repl_btn.callback_pressed_add(self.repl_pressed)
+        repl_btn.show()
 
-        closeButton = Button(self._canvas)
-        closeButton.text = "Done"
-        closeButton.callback_pressed_add(self._parent.show_find)
-        closeButton.show()
+        close_btn = Button(self._canvas)
+        close_btn.text = "Done"
+        close_btn.callback_pressed_add(self._parent.show_find)
+        close_btn.show()
 
         self.caseCheck = Check(self._canvas, text="Case Sensitive")
         self.caseCheck.state_set(self._parent.config['case_sensitive'])
         self.caseCheck.callback_changed_add(self.case_updt)
         self.caseCheck.show()
 
-        buttonBox.pack_end(self.caseCheck)
-        buttonBox.pack_end(findButton)
-        buttonBox.pack_end(replaceButton)
-        buttonBox.pack_end(closeButton)
+        btn_box.pack_end(self.caseCheck)
+        btn_box.pack_end(find_btn)
+        btn_box.pack_end(repl_btn)
+        btn_box.pack_end(close_btn)
 
-        self.pack_end(frameBox)
-        self.pack_end(buttonBox)
+        self.pack_end(frame_box)
+        self.pack_end(btn_box)
 
-    def replacePressed(self, obj):
+    def repl_pressed(self, obj):
         ''' find-and-replace activated '''
         tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get())
         if not self.caseCheck.state_get():
@@ -1024,16 +1024,16 @@ class ePadFindBox(Box):
             #if replace_string:
             if len(locations):
                 if not self._parent.config['case_sensitive']:
-                    ourRe = re.compile(search_string, re.IGNORECASE)
+                    our_re = re.compile(search_string, re.IGNORECASE)
                 else:
-                    ourRe = re.compile(search_string)
-                tmp_text = ourRe.sub(replace_string, tmp_text).encode('utf-8').strip()
+                    our_re = re.compile(search_string)
+                tmp_text = our_re.sub(replace_string, tmp_text).encode('utf-8').strip()
                 tmp_text = utf8_to_markup(tmp_text)
-                curPos = self._parent.tabbs.current.mainEn.cursor_pos_get()
+                cur_pos = self._parent.tabbs.current.mainEn.cursor_pos_get()
                 self._parent.tabbs.current.mainEn.text_set(tmp_text)
                 try:
-                    self._parent.tabbs.current.mainEn.cursor_pos_set(curPos)
-                except:
+                    self._parent.tabbs.current.mainEn.cursor_pos_set(cur_pos)
+                except SystemError:
                     pass
                     #print("Error: Can't set cursor position")
                 self._parent.tabbs.current.textEdited()
@@ -1046,7 +1046,7 @@ class ePadFindBox(Box):
         else:
             error_popup(self._parent.main_wndw, "No find string entered.")
 
-    def findPressed(self, obj):
+    def find_pressed(self, obj):
         ''' search for next instance '''
         if not self.caseCheck.state_get():
             search_string = self.findEntry.text.lower()
@@ -1057,8 +1057,8 @@ class ePadFindBox(Box):
         search_length = len(search_string)
         if search_length:
             locations = list(self.find_all(tmp_text, search_string))
-            if len(locations):
-                if self.currentFind == None or search_string != self.lastSearch:
+            if locations:
+                if (self.currentFind is None) or (search_string != self.lastSearch):
                     self.lastSearch = search_string
                     self.currentFind = locations[0]
                 else:

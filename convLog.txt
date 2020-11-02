@@ -13,43 +13,9 @@ RefactoringTool: Refactored epad
 --- epad	(original)
 +++ epad	(refactored)
 @@ -16,7 +16,7 @@
- #    You should have received a copy of the GNU General Public License
- #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
--from __future__ import print_function  # May as well bite the bullet
-+  # May as well bite the bullet
+			...
 
- __author__ = "Jeff Hoogland"
- __contributors__ = ["Jeff Hoogland", "Robert Wiley", "Kai Huuhko", "Scimmia22"]
-@@ -76,7 +76,7 @@
- import errno
- import sys
- import os
--import urllib
-+import urllib.request, urllib.parse, urllib.error
- import io
- import json
- from collections import Mapping
-@@ -521,7 +521,7 @@
-             for ourFile in start[0]:
-                 if ourFile[:7] == "file://":
-                     try:
--                        ourFile = urllib.url2pathname(ourFile[7:])
-+                        ourFile = urllib.request.url2pathname(ourFile[7:])
-                     except AttributeError:
-                         # Python3
-                         ourFile = urllib.request.url2pathname(ourFile[7:])
-@@ -1342,9 +1342,9 @@
-                 config.update({'font': 'Mono', 'font_size': 24})
-         """
-         if settings is not None:
--            for setting, value in settings.items() if isinstance(settings, Mapping) else settings:
-+            for setting, value in list(settings.items()) if isinstance(settings, Mapping) else settings:
-                 self.__safe_set(setting, value)
--        for setting, value in kwargs.items():
-+        for setting, value in list(kwargs.items()):
-             self.__safe_set(setting, value)
-         self.write()
 
 RefactoringTool: Files that were modified:
 RefactoringTool: epad
@@ -165,3 +131,16 @@ to fix:  fileselcncl_pressed() takes 1 positional argument but 2 were given
     	>>>added argument obj.
 method, findAll >> find_all
 method, lastFind >> last_find
+changed, if self.currentFind == None  to if (self.currentFind is None)
+len() used to determine if list is empty, if len(locations: >> if locations:  in find_pressed
+method, findPressed >> find_pressed
+bare exception, except: >> except SystemError:
+variable, curPos >> cur_pos
+variable, ourRe >> our_re
+method, replacePressed >> repl_pressed
+variable, closeButton >> close_btn
+variable, replaceButton >> repl_btn
+variable, findButton >> find_btn
+variable, buttonBox >> btn_box
+variable, replaceBox >> repl_box
+variable, frameBox >> frame_box
