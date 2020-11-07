@@ -1,0 +1,1 @@
+When I use "Find", the focus should go to the found string

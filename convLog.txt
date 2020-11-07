@@ -144,3 +144,27 @@ variable, findButton >> find_btn
 variable, buttonBox >> btn_box
 variable, replaceBox >> repl_box
 variable, frameBox >> frame_box
+len() used to determine if list is empty, if len(locations): >> if locations:  in repl_pressed
+attribute, caseCheck >> case_chk
+attribute, replaceEntry >> repl_entry
+attribute, findEntry >> find_entry
+attribute, lastSearch >> last_srch
+attribute, currentFind >> curr_find
+class, ePadFindBox >> EpadFindbox
+len() used to determine if list is empty, if len(tmp_text): >> if tmp_text:  in doSelected
+unnecessary "pass" statement in doSelected; removed
+method, doSelected >> do_slctd
+variable, tb >> _tb in fileExists
+method, fileExists >> file_exists
+one more tb >> _tb in file_exists
+a couple of indentation cleanups
+removed unused argument, tabbs, in tab_chngd
+removed unused argument, tabbs, in bse_file
+removed unused argument, tabbs, in close_file
+argument, onStartup >> on_srtup
+variable, IsSave >> is_save
+variable, allSaved >> all_saved
+argument, bt >> _bt
+variable tb >> _tb in unsvdwrk_popup
+variable ourFile >> our_file
+len() used to determine empty sequence; if not len(self.tabbs.tabs) >> if not self.tabbs.tabs

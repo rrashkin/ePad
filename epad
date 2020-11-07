@@ -239,7 +239,7 @@ class Interface(object):
                 self.main_box.pack_end(notify_box)
                 notify_box.show()
 
-        self.find_box = ePadFindBox(self, self.main_wndw)
+        self.find_box = EpadFindbox(self, self.main_wndw)
         self.find_vsbl = False
 
         self.tabbs = TabbedBox(self.main_wndw, size_hint_weight=EXPAND_BOTH,
@@ -285,7 +285,7 @@ class Interface(object):
         self.main_wndw.resize_object_add(self.flip)
         self.flip.show()
 
-    def tab_chngd(self, tabbs, widget):
+    def tab_chngd(self, widget):
         ''' handler for when focus changes tabs '''
         self.main_wndw.title = widget.data["button"].text
         self.main_tb.savebtn.disabled = not widget.dirty
@@ -305,11 +305,11 @@ class Interface(object):
         self.tabbs.add(entry_box, tab_name)
         entry_box.mainEn.focus_set(True)
 
-    def base_file(self, tabbs):
+    def base_file(self):
         '''This function gets called when all files are closed '''
         self.add_file("Untitled")
 
-    def close_file(self, tabbs, widget):
+    def close_file(self, widget):
         ''' initiate checks to close file '''
         widget.close_chks()
 
@@ -344,9 +344,9 @@ class Interface(object):
         ''' display find dialog '''
         if not self.find_vsbl:
             self.main_box.pack_before(self.find_box, self.tabbs)
-            self.find_box.findEntry.text = self.tabbs.current.mainEn.selection_get()
-            self.find_box.findEntry.focus_set(True)
-            self.find_box.findEntry.cursor_end_set()
+            self.find_box.find_entry.text = self.tabbs.current.mainEn.selection_get()
+            self.find_box.find_entry.focus_set(True)
+            self.find_box.find_entry.cursor_end_set()
             self.find_box.show()
             self.find_vsbl = True
         else:
@@ -399,9 +399,9 @@ class Interface(object):
                 self.tabbs.current.setDirty(False)
                 self.tabbs.current.isSaved = True
 
-    def file_slctd(self, _fs, file_selected, onStartup=False):
+    def file_slctd(self, _fs, file_selected, on_srtup=False):
         ''' function identifies selected file '''
-        if not onStartup:
+        if not on_srtup:
             self.flip.go(ELM_FLIP_ROTATE_XZ_CENTER_AXIS)
             # Markup can end up in file names because file_selector name_entry
             #   is an elementary entry. So lets sanitize file_selected.
@@ -413,10 +413,10 @@ class Interface(object):
 
             _fs.file_entry.text = file_selected.split("/")[-1]
 
-        IsSave = _fs.mode
+        is_save = _fs.mode
 
         if file_selected:
-            if IsSave == "save":
+            if is_save == "save":
                 if os.path.isdir(file_selected):
                     current_file = os.path.basename(file_selected)
                     error_msg = ("<b>'%s'</b> is a folder."
@@ -425,10 +425,10 @@ class Interface(object):
                     error_popup(self.main_wndw, error_msg)
                     return
                 elif os.path.exists(file_selected):
-                    self.tabbs.current.fileExists(file_selected)
+                    self.tabbs.current.file_exists(file_selected)
                     return
                 else:
-                    self.tabbs.current.doSelected(file_selected)
+                    self.tabbs.current.do_slctd(file_selected)
                     return
             else:
                 self.add_file(file_selected)
@@ -447,18 +447,18 @@ class Interface(object):
 
     def close_chks(self, obj=False):
         ''' check status is ok to close '''
-        allSaved = True
+        all_saved = True
 
         for en in self.tabbs.tabs:
             if not en.isSaved:
-                allSaved = False
+                all_saved = False
 
-        if allSaved:
+        if all_saved:
             self.close_app()
         else:
             self.unsvdwrk_popup()
 
-    def close_popup(self, bt, cnfrm_popup):
+    def close_popup(self, _bt, cnfrm_popup):
         ''' close are-you-sure? popup '''
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
@@ -472,22 +472,22 @@ class Interface(object):
                                  size_hint_weight=EXPAND_BOTH)
 
         # Add a table to hold dialog image and text to Popup
-        tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
-        self.cnfrm_popup.part_content_set("default", tb)
-        tb.show()
+        _tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup.part_content_set("default", _tb)
+        _tb.show()
 
         # Add dialog-error Image to table
         icon = Icon(self.cnfrm_popup, resizable=(True, True),
                     size_hint_weight=EXPAND_BOTH, size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
-        tb.pack(icon, 0, 0, 1, 1)
+        _tb.pack(icon, 0, 0, 1, 1)
         icon.show()
         # Add dialog text to table
         dialog_lbl = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
                            size_hint_weight=EXPAND_HORIZ,
                            size_hint_align=FILL_BOTH)
         dialog_lbl.text = "You have unsaved work. Close anyways?<br><br>"
-        tb.pack(dialog_lbl, 1, 0, 1, 1)
+        _tb.pack(dialog_lbl, 1, 0, 1, 1)
         dialog_lbl.show()
 
         # Close without saving button
@@ -541,25 +541,25 @@ class Interface(object):
     def launch(self, start=[]):
         ''' launch main application window '''
         if start[0]:
-            for count, ourFile in enumerate(start[0]):
-                if os.path.dirname(ourFile) == '':
-                    start[0][count] = os.getcwd() + '/' + ourFile
+            for count, our_file in enumerate(start[0]):
+                if os.path.dirname(our_file) == '':
+                    start[0][count] = os.getcwd() + '/' + our_file
 
         if start and start[0]:
-            for ourFile in start[0]:
-                if ourFile[:7] == "file://":
+            for our_file in start[0]:
+                if our_file[:7] == "file://":
                     try:
-                        ourFile = urllib.request.url2pathname(ourFile[7:])
+                        our_file = urllib.request.url2pathname(our_file[7:])
                     except AttributeError:
                         # Python3
-                        ourFile = urllib.request.url2pathname(ourFile[7:])
-                if os.path.isdir(os.path.dirname(ourFile)):
-                    if os.path.isfile(ourFile):
-                        ##print(ourFile)
-                        self.add_file(ourFile)
+                        our_file = urllib.request.url2pathname(our_file[7:])
+                if os.path.isdir(os.path.dirname(our_file)):
+                    if os.path.isfile(our_file):
+                        ##print(our_file)
+                        self.add_file(our_file)
                 else:
                     error_msg = ("<b>'%s'</b> is an Invalid path."
-                                 "<br><br>Open failed !!!" % (ourFile))
+                                 "<br><br>Open failed !!!" % (our_file))
                     error_popup(self.main_wndw, error_msg)
         if start and start[1]:
             if os.path.isdir(start[1]):
@@ -567,7 +567,7 @@ class Interface(object):
             else:
                 pass
 
-        if not len(self.tabbs.tabs):
+        if not self.tabbs.tabs:
             self.add_file("Untitled")
 
         self.main_wndw.show()
@@ -840,22 +840,22 @@ class ePadEntry(Box):
         self.cnfrm_popup.delete()
         self.cnfrm_popup = None
 
-    def fileExists(self, file_path):
+    def file_exists(self, file_path):
         ''' handler for when saveas filename exists '''
         self.cnfrm_popup = Popup(self._parent.main_wndw,
                                  size_hint_weight=EXPAND_BOTH)
 
         # Add a table to hold dialog image and text to Popup
-        tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
-        self.cnfrm_popup.part_content_set("default", tb)
-        tb.show()
+        _tb = Table(self.cnfrm_popup, size_hint_weight=EXPAND_BOTH)
+        self.cnfrm_popup.part_content_set("default", _tb)
+        _tb.show()
 
         # Add dialog-error Image to table
         icon = Icon(self.cnfrm_popup, resizable=(True, True),
                     size_hint_weight=EXPAND_BOTH,
                     size_hint_align=FILL_BOTH)
         icon.standard_set('dialog-question')
-        tb.pack(icon, 0, 0, 1, 1)
+        _tb.pack(icon, 0, 0, 1, 1)
         icon.show()
         # Add dialog text to table
         dialog_lbl = Label(self.cnfrm_popup, line_wrap=ELM_WRAP_WORD,
@@ -864,7 +864,7 @@ class ePadEntry(Box):
         current_file = os.path.basename(file_path)
         dialog_lbl.text = "'%s' already exists. Overwrite?<br><br>" \
                            % (current_file)
-        tb.pack(dialog_lbl, 1, 0, 1, 1)
+        _tb.pack(dialog_lbl, 1, 0, 1, 1)
         dialog_lbl.show()
 
         # Close without saving button
@@ -875,7 +875,7 @@ class ePadEntry(Box):
         # Save the file and then close button
         sav_btt = Button(self._parent.main_wndw)
         sav_btt.text = "Yes"
-        sav_btt.callback_clicked_add(self.doSelected)
+        sav_btt.callback_clicked_add(self.do_slctd)
         sav_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
         sav_btt.show()
 
@@ -884,7 +884,7 @@ class ePadEntry(Box):
         self.cnfrm_popup.part_content_set("button3", sav_btt)
         self.cnfrm_popup.show()
 
-    def doSelected(self, obj):
+    def do_slctd(self, obj):
         ''' deal with selected file '''
         # Something I should avoid but here I prefer a polymorphic function
         if isinstance(obj, Button):
@@ -896,7 +896,6 @@ class ePadEntry(Box):
             try:
                 newfile = io.open(file_selected, 'w')
             except IOError as err:
-                pass
                 #print("ERROR: {0}: '{1}'".format(err.strerror,
                 #                                    file_selected))
                 if err.errno == errno.EACCES:
@@ -923,7 +922,7 @@ class ePadEntry(Box):
                 #print("Empty file saved:{0}".format(file_selected))
             self.mainEn.entry_set(tmp_text)
                 # if empty file entry.file_save destroys file :(
-            if len(tmp_text):
+            if tmp_text:
                 self.mainEn.file_save()
             self._parent.main_wndw.title_set(" %s - ePad" % os.path.basename(file_selected))
             self.data["button"].text = " %s" % os.path.basename(file_selected)
@@ -932,7 +931,7 @@ class ePadEntry(Box):
             self.isNewFile = False
             self.setDirty(False)
 
-class ePadFindBox(Box):
+class EpadFindbox(Box):
     ''' instantiate find text dialog '''
     def __init__(self, parent, canvas):
         Box.__init__(self, canvas)
@@ -942,8 +941,8 @@ class ePadFindBox(Box):
         self.size_hint_weight = EXPAND_HORIZ
         self.size_hint_align = FILL_HORIZ
 
-        self.currentFind = None
-        self.lastSearch = None
+        self.curr_find = None
+        self.last_srch = None
 
         frame_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
         frame_box.horizontal = True
@@ -953,26 +952,26 @@ class ePadFindBox(Box):
         find_box.text = "Find Text:"
         find_box.show()
 
-        self.findEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
-                               size_hint_align=FILL_HORIZ)
-        self.findEntry.single_line_set(True)
-        self.findEntry.scrollable_set(True)
-        self.findEntry.callback_activated_add(self.find_pressed)
-        self.findEntry.show()
+        self.find_entry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                                size_hint_align=FILL_HORIZ)
+        self.find_entry.single_line_set(True)
+        self.find_entry.scrollable_set(True)
+        self.find_entry.callback_activated_add(self.find_pressed)
+        self.find_entry.show()
 
-        find_box.content = self.findEntry
+        find_box.content = self.find_entry
 
         repl_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
         repl_box.text = "Replace Text:"
         repl_box.show()
 
-        self.replaceEntry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
-                                  size_hint_align=FILL_HORIZ)
-        self.replaceEntry.single_line_set(True)
-        self.replaceEntry.scrollable_set(True)
-        self.replaceEntry.show()
+        self.repl_entry = Entry(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                                size_hint_align=FILL_HORIZ)
+        self.repl_entry.single_line_set(True)
+        self.repl_entry.scrollable_set(True)
+        self.repl_entry.show()
 
-        repl_box.content = self.replaceEntry
+        repl_box.content = self.repl_entry
 
         frame_box.pack_end(find_box)
         frame_box.pack_end(repl_box)
@@ -996,12 +995,12 @@ class ePadFindBox(Box):
         close_btn.callback_pressed_add(self._parent.show_find)
         close_btn.show()
 
-        self.caseCheck = Check(self._canvas, text="Case Sensitive")
-        self.caseCheck.state_set(self._parent.config['case_sensitive'])
-        self.caseCheck.callback_changed_add(self.case_updt)
-        self.caseCheck.show()
+        self.case_chk = Check(self._canvas, text="Case Sensitive")
+        self.case_chk.state_set(self._parent.config['case_sensitive'])
+        self.case_chk.callback_changed_add(self.case_updt)
+        self.case_chk.show()
 
-        btn_box.pack_end(self.caseCheck)
+        btn_box.pack_end(self.case_chk)
         btn_box.pack_end(find_btn)
         btn_box.pack_end(repl_btn)
         btn_box.pack_end(close_btn)
@@ -1012,17 +1011,17 @@ class ePadFindBox(Box):
     def repl_pressed(self, obj):
         ''' find-and-replace activated '''
         tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get())
-        if not self.caseCheck.state_get():
-            search_string = self.findEntry.text.lower()
+        if not self.case_chk.state_get():
+            search_string = self.find_entry.text.lower()
             locations = list(self.find_all(tmp_text.lower(), search_string))
         else:
-            search_string = self.findEntry.text
+            search_string = self.find_entry.text
             locations = list(self.find_all(tmp_text, search_string))
         search_length = len(search_string)
         if search_length:
-            replace_string = self.replaceEntry.text
+            replace_string = self.repl_entry.text
             #if replace_string:
-            if len(locations):
+            if locations:
                 if not self._parent.config['case_sensitive']:
                     our_re = re.compile(search_string, re.IGNORECASE)
                 else:
@@ -1048,27 +1047,27 @@ class ePadFindBox(Box):
 
     def find_pressed(self, obj):
         ''' search for next instance '''
-        if not self.caseCheck.state_get():
-            search_string = self.findEntry.text.lower()
+        if not self.case_chk.state_get():
+            search_string = self.find_entry.text.lower()
             tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get()).lower()
         else:
-            search_string = self.findEntry.text
+            search_string = self.find_entry.text
             tmp_text = markup_to_utf8(self._parent.tabbs.current.mainEn.entry_get())
         search_length = len(search_string)
         if search_length:
             locations = list(self.find_all(tmp_text, search_string))
             if locations:
-                if (self.currentFind is None) or (search_string != self.lastSearch):
-                    self.lastSearch = search_string
-                    self.currentFind = locations[0]
+                if (self.curr_find is None) or (search_string != self.last_srch):
+                    self.last_srch = search_string
+                    self.curr_find = locations[0]
                 else:
-                    last_find = locations.index(self.currentFind)
+                    last_find = locations.index(self.curr_find)
                     if last_find < len(locations)-1:
-                        self.currentFind = locations[last_find+1]
+                        self.curr_find = locations[last_find+1]
                     else:
-                        self.currentFind = locations[0]
-                self._parent.tabbs.current.mainEn.select_region_set(self.currentFind,
-                                                                    self.currentFind+search_length)
+                        self.curr_find = locations[0]
+                self._parent.tabbs.current.mainEn.select_region_set(self.curr_find,
+                                                                    self.curr_find+search_length)
             else:
                 error_popup(self._parent.main_wndw, "Text %s not found."%search_string)
         else:
