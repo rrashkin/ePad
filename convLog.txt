@@ -1,7 +1,7 @@
 epad conversion log
 
 current epad runs in Python2
-{open, save, save as, <edit>, new}
+{open, save, save as, <edit>, new},  use buttons
 
 ------------------------------------------------------------------2to3
 rashkin@rrLaptop:~/BLPython/epad$ 2to3 -w epad
@@ -106,7 +106,7 @@ removed unused argument, it, in selectAllPress()
 method, selectAllPress >> slctall_press
 method, cutPress >> cut_press
 method, pastePress >> paste_press
-removed unused argument, it, from cut_press and paste_press
+
 method, itemClicked >> item_clicked
 method, copyPress >> copy_press
 method, reDoPress >> redo_press
@@ -168,3 +168,63 @@ argument, bt >> _bt
 variable tb >> _tb in unsvdwrk_popup
 variable ourFile >> our_file
 len() used to determine empty sequence; if not len(self.tabbs.tabs) >> if not self.tabbs.tabs
+method, confirmSave >> cnfrm_save
+argument, ourCallback >> our_cb
+method, textEdited >> txt_editd
+added "unused" arg, "_it" to cut_press and paste_press
+[[removed unused argument, it, from cut_press and paste_press]]<<undonw
+2x "bare-except", changed "Except:" to "Except KeyError" in SetDirty()
+method setDirty >> set_dirty
+method curChanged >> cur_chngd
+removed "pointless string":
+            '''for i in range(self.totalLines+1, self.currentLinesShown+1):
+                ll = self.lineList
+                ll.cursor_end_set()
+                ll.cursor_prev()
+                ll.cursor_selection_begin()
+                ll.cursor_line_begin_set()
+                ll.cursor_prev()
+                ll.cursor_selection_end()
+                ll.selection_cut()'''
+ from checkLineNumbers
+method checkLineNumbers >> chk_linenums
+			[that's what I get for going backwards]
+argument, en >> _en
+class, ePadEntry >> EpadEntry
+attribute, lineList >> line_lst
+attribute, currentLinesShown >> cur_lines_shwn
+attribute, lineNums >> line_nums
+attribute, mainEn >> main_en
+attribute, totalLines >> total_lines
+attribute, isNewFile >> is_nwfile
+attribute, isSaved >> is_saved
+attribute, doArchive >> do_archive
+attribute, doSpot >> do_spot
+method, takeSnapShot >> take_snapshot
+variable, entryGet >> entry_get
+Line 67; unused variable, i: I think it's best to leave it for iteration.
+method, saveSnapShot >> save_snapshot
+method, unDo >> un_do
+method, reDo >> re_do
+(unused) argument, bt >> _bt
+--disabled "unused-argument" errors at line 189.  See unusedArg.txt for list. These are all needed because efl.extentions calls them with those arguments.
+removed unused variable 'msg' from "except (RuntimeWarning, RuntimeError) as msg:" in open_file()
+--disabled "no-name-in-module" at line 21. The statement:
+from efl.evas import EVAS_HINT_EXPAND, EVAS_HINT_FILL,\
+                     EVAS_CALLBACK_KEY_UP, EVAS_EVENT_FLAG_ON_HOLD
+is absolutely necessary to even execute.
+--disabled "redefined-outer-name" at line 139. Not sure what's going on there but I think it's above my pay grade.
+--disabled "too-many-instance-attributes, too-many-statements, too-many-public-methods" at line 195
+--disabled "no-self-use, no-member, c-extension-no-member" at line 312. 
+	Getting rid of "self" breaks the execution
+	Even though it says "no member" everything is running so I don't know how to fix it
+--disabled "no-else-return" at line 419.
+	it doesn't seem to me that the "else" is really un-needed
+--disabled "too-many-branches" at line 511
+--disabled "dangerout-default-value" at line 544. I'm not convinced an empty list is a dangerous default.
+--disabled "unused-variable" at line 678
+--disabled "attribute-defined-outside-init" at line 801
+--disabled "no-self-use" at line 1073
+--disabled "no-self-use" at line 1248
+--disabled "attribute-defined-outside-init" at line 1360
+--disabled "no-member" at line 1418
