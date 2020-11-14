@@ -63,7 +63,7 @@ from elmextensions import AboutWindow, InstanceError
 from elmextensions import FileSelector
 from elmextensions import TabbedBox
 
-  # May as well bite the bullet
+# May as well bite the bullet
 
 __author__ = "Jeff Hoogland"
 __contributors__ = ["Jeff Hoogland", "Robert Wiley", "Kai Huuhko", "Scimmia22"]
@@ -106,14 +106,17 @@ GNU General Public License for more details.<br><br>
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see<br>
-<link><a href=http://www.gnu.org/licenses>http://www.gnu.org/licenses/</a></link>
+<link>
+<a href=http://www.gnu.org/licenses>http://www.gnu.org/licenses/</a>
+</link>
 </align>
 <br>
 """
 
 INFO = """
 <align=center>
-<hilight>ePad</hilight> is a simple text editor written in Elementary and Python.<br>
+<hilight>ePad</hilight>
+is a simple text editor written in Elementary and Python.<br>
 <br>
 <br>
 </align>
@@ -136,6 +139,8 @@ def print_err(*args, **kwargs):
     error message to stderr
     """
     print('[ePad]:', *args, file=sys.stderr, **kwargs)
+
+
 # pylint: disable=redefined-outer-name
 def error_popup(window, error_msg):
     ''' create a popup alert '''
@@ -185,6 +190,7 @@ def close_menu(obj, label):
         obj.selected_set(False)
         obj.menu_get().close()
     close_menu.count = (close_menu.count + 1) % 2
+
 
 # pylint: disable=unused-argument
 def reset_closemenu_count(obj):

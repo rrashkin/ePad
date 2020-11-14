@@ -228,3 +228,10 @@ is absolutely necessary to even execute.
 --disabled "no-self-use" at line 1248
 --disabled "attribute-defined-outside-init" at line 1360
 --disabled "no-member" at line 1418
+
+------------------------------------------------------------------yapf
+ -- no yapf errors
+
+------------------------------------------------------------------flake8
+epad:2:1: E265 block comment should start with '# '. This is the "#!/usr/bin/python" line and I don't want to mess with that.
+various "line too long"s
