@@ -198,7 +198,10 @@ def reset_closemenu_count(obj):
     # global close_menu
     if hasattr(close_menu, 'count'):
         close_menu.count = 0
-# pylint: disable=too-many-instance-attributes, too-many-statements, too-many-public-methods
+
+
+# pylint: disable=too-many-instance-attributes,
+# pylint: disable=too-many-statements, too-many-public-methods
 class Interface(object):
     ''' container class for editor interface '''
     def __init__(self):
@@ -209,7 +212,7 @@ class Interface(object):
                                         size=(600, 400))
         self.main_wndw.callback_delete_request_add(self.close_chks)
         self.main_wndw.elm_event_callback_add(self.evnts_cb)
-        #self.main_wndw.repeat_events_set(False)
+        # self.main_wndw.repeat_events_set(False)
 
         icon = Icon(self.main_wndw,
                     size_hint_weight=EXPAND_BOTH,
@@ -329,8 +332,8 @@ class Interface(object):
         ''' blank tab for new file '''
         if self.config["new_instance"]:
             print("Launching new instance")
-            ecore.Exe('epad', ecore.ECORE_EXE_PIPE_READ|
-                      ecore.ECORE_EXE_PIPE_ERROR|
+            ecore.Exe('epad', ecore.ECORE_EXE_PIPE_READ |
+                      ecore.ECORE_EXE_PIPE_ERROR |
                       ecore.ECORE_EXE_PIPE_WRITE)
             return
         self.add_file("Untitled")
@@ -351,7 +354,8 @@ class Interface(object):
         ''' display find dialog '''
         if not self.find_vsbl:
             self.main_box.pack_before(self.find_box, self.tabbs)
-            self.find_box.find_entry.text = self.tabbs.current.main_en.selection_get()
+            self.find_box.find_entry.text =\
+                self.tabbs.current.main_en.selection_get()
             self.find_box.find_entry.focus_set(True)
             self.find_box.find_entry.cursor_end_set()
             self.find_box.show()
@@ -376,13 +380,15 @@ class Interface(object):
 
     def save_file(self, obj=False):
         ''' handler for save file '''
-        if self.tabbs.current.main_en.file_get()[0] is None or self.tabbs.current.is_nwfile:
+        if self.tabbs.current.main_en.file_get()[0]\
+           is None or self.tabbs.current.is_nwfile:
             self.save_as()
         else:
             if not self.tabbs.current.is_saved:
                 file_selected = self.tabbs.current.main_en.file_get()[0]
-                # Detect save errors as entry.file_save currently returns no errors
-                #   even in the case where the file fails to save :(
+                # Detect save errors as entry.file_save currently
+                # returns no errors
+                # even in the case where the file fails to save :(
                 try:
                     newfile = io.open(file_selected, 'w')
                 except IOError as err:
@@ -414,7 +420,7 @@ class Interface(object):
             #   is an elementary entry. So lets sanitize file_selected.
             file_selected = markup_to_utf8(file_selected)
         if file_selected:
-            #print("File Selected: {0}".format(file_selected))
+            # print("File Selected: {0}".format(file_selected))
             self.last_dir = os.path.dirname(file_selected)
             # This fails if file_selected does not exist yet
 
@@ -422,7 +428,7 @@ class Interface(object):
 
         is_save = _fs.mode
 
-#pylint: disable=no-else-return
+# pylint: disable=no-else-return
         if file_selected:
             if is_save == "save":
                 if os.path.isdir(file_selected):
@@ -522,7 +528,7 @@ class Interface(object):
 
         if event.modifier_is_set("Control"):
             if event.keyname == "n":
-                #new_file(self.new_file)
+                # new_file(self.new_file)
                 self.new_file()
             elif event.keyname == "s" and event.modifier_is_set("Shift"):
                 self.save_as()
@@ -541,7 +547,8 @@ class Interface(object):
                 self.close_chks()
             elif event.keyname == "f":
                 self.show_find()
-        elif isinstance(src, Entry) and event.key in ["space", "BackSpace", "Return"]:
+        elif isinstance(src, Entry) and event.key in ["space",
+                                                      "BackSpace", "Return"]:
             self.tabbs.current.take_snapshot()
 
         event.event_flags = event.event_flags | EVAS_EVENT_FLAG_ON_HOLD
@@ -565,7 +572,7 @@ class Interface(object):
                         our_file = urllib.request.url2pathname(our_file[7:])
                 if os.path.isdir(os.path.dirname(our_file)):
                     if os.path.isfile(our_file):
-                        ##print(our_file)
+                        # print(our_file)
                         self.add_file(our_file)
                 else:
                     error_msg = ("<b>'%s'</b> is an Invalid path."
@@ -581,6 +588,7 @@ class Interface(object):
             self.add_file("Untitled")
 
         self.main_wndw.show()
+
 
 class EpadEntry(Box):
     ''' tile text entry box in main window '''
@@ -604,9 +612,10 @@ class EpadEntry(Box):
         font_size = self._config['font_size']
 
         self.font_style = "DEFAULT='font={0} font_style={1} font_weight={2}\
-                          font_width={3} font_size={4}'".format(font, font_style,
-                                                                font_weight, font_width,
-                                                                str(font_size))
+                          font_width={3} font_size={4}'".\
+                          format(font, font_style,
+                                 font_weight, font_width,
+                                 str(font_size))
 
         self.entry_box = Box(self._canvas,
                              size_hint_weight=EXPAND_BOTH,
@@ -638,7 +647,8 @@ class EpadEntry(Box):
         self.main_en.callback_selection_cut_add(self.take_snapshot)
         self.main_en.callback_selection_paste_add(self.take_snapshot)
         # Don't let line_lst steal focus
-        self.line_lst.callback_clicked_add(lambda o: self.main_en.focus_set(True))
+        self.line_lst.callback_clicked_add(lambda o:
+                                           self.main_en.focus_set(True))
         self.main_en.text_style_user_push(self.font_style)
 
         self.total_lines = 0
@@ -705,13 +715,14 @@ class EpadEntry(Box):
 
         self.do_spot = len(self.do_archive) - 1
 
-
     def un_do(self):
         ''' back out edit '''
         if self.do_spot > 0:
-            # A check if this is the first time we are undoing that we store the latest data
+            # A check if this is the first time we are
+            # undoing that we store the latest data
             if self.do_spot == len(self.do_archive) - 1:
-                if self.do_archive[self.do_spot][1] != self.main_en.entry_get():
+                if self.do_archive[self.do_spot][1] !=\
+                 self.main_en.entry_get():
                     self.take_snapshot()
             self.do_spot -= 1
             self.main_en.entry_set(self.do_archive[self.do_spot][1])
@@ -729,14 +740,14 @@ class EpadEntry(Box):
         if self.cur_lines_shwn < self.total_lines:
             lines = ""
             for i in range(self.cur_lines_shwn+1, self.total_lines+1):
-                lines += "%s<br>"%(i)
+                lines += "%s<br>" % (i)
             self.line_lst.entry_append(lines)
             self.cur_lines_shwn = self.total_lines
         elif self.cur_lines_shwn > self.total_lines:
             lines = "<i>"
 
             for i in range(1, self.total_lines+1):
-                lines = "%s%s<br>"%(lines, i)
+                lines = "%s%s<br>" % (lines, i)
 
             self.line_lst.entry_set(lines)
 
@@ -791,7 +802,7 @@ class EpadEntry(Box):
         except (RuntimeWarning, RuntimeError):
             pass
         self.is_nwfile = False
-        #Reset undo/redo tracks when we open a file
+        # Reset undo/redo tracks when we open a file
         self.do_archive = []
         self.do_spot = 0
         self.take_snapshot()
@@ -818,7 +829,8 @@ class EpadEntry(Box):
         no_btt = Button(self._parent.main_wndw)
         no_btt.text = "No"
         no_btt.callback_clicked_add(self.close_popup, self.cnfrm_popup)
-        no_btt.callback_clicked_add(lambda o: self._parent.tabbs.deleteTab(self))
+        no_btt.callback_clicked_add(lambda o:
+                                    self._parent.tabbs.deleteTab(self))
         no_btt.show()
         # cancel close request
         cancel_btt = Button(self._parent.main_wndw)
@@ -866,7 +878,7 @@ class EpadEntry(Box):
                            size_hint_align=FILL_BOTH)
         current_file = os.path.basename(file_path)
         dialog_lbl.text = "'%s' already exists. Overwrite?<br><br>" \
-                           % (current_file)
+                          % (current_file)
         _tb.pack(dialog_lbl, 1, 0, 1, 1)
         dialog_lbl.show()
 
@@ -899,7 +911,7 @@ class EpadEntry(Box):
             try:
                 newfile = io.open(file_selected, 'w')
             except IOError as err:
-                #print("ERROR: {0}: '{1}'".format(err.strerror,
+                # print("ERROR: {0}: '{1}'".format(err.strerror,
                 #                                    file_selected))
                 if err.errno == errno.EACCES:
                     error_msg = ("Permision denied: <b>'%s'</b>."
@@ -913,26 +925,28 @@ class EpadEntry(Box):
                     error_popup(self._parent.main_wndw, error_msg)
                 return
             tmp_text = self.main_en.entry_get()
-                # fixme: Why save twice?
+            # fixme: Why save twice?
             newfile.write(tmp_text)
             newfile.close()
-                # Suppress error message when empty file is saved
+            # Suppress error message when empty file is saved
             try:
                 self.main_en.file_set(file_selected,
                                       ELM_TEXT_FORMAT_PLAIN_UTF8)
             except RuntimeError:
                 pass
-                #print("Empty file saved:{0}".format(file_selected))
+                # print("Empty file saved:{0}".format(file_selected))
             self.main_en.entry_set(tmp_text)
-                # if empty file entry.file_save destroys file :(
+            # if empty file entry.file_save destroys file :(
             if tmp_text:
                 self.main_en.file_save()
-            self._parent.main_wndw.title_set(" %s - ePad" % os.path.basename(file_selected))
+            self._parent.main_wndw.title_set(" %s - ePad" %
+                                             os.path.basename(file_selected))
             self.data["button"].text = " %s" % os.path.basename(file_selected)
 
             self.is_saved = True
             self.is_nwfile = False
             self.set_dirty(False)
+
 
 class EpadFindbox(Box):
     ''' instantiate find text dialog '''
@@ -947,11 +961,13 @@ class EpadFindbox(Box):
         self.curr_find = None
         self.last_srch = None
 
-        frame_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        frame_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                        size_hint_align=FILL_HORIZ)
         frame_box.horizontal = True
         frame_box.show()
 
-        find_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        find_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                         size_hint_align=FILL_HORIZ)
         find_box.text = "Find Text:"
         find_box.show()
 
@@ -964,7 +980,8 @@ class EpadFindbox(Box):
 
         find_box.content = self.find_entry
 
-        repl_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        repl_box = Frame(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                         size_hint_align=FILL_HORIZ)
         repl_box.text = "Replace Text:"
         repl_box.show()
 
@@ -979,7 +996,8 @@ class EpadFindbox(Box):
         frame_box.pack_end(find_box)
         frame_box.pack_end(repl_box)
 
-        btn_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ, size_hint_align=FILL_HORIZ)
+        btn_box = Box(self._canvas, size_hint_weight=EXPAND_HORIZ,
+                      size_hint_align=FILL_HORIZ)
         btn_box.horizontal = True
         btn_box.show()
 
@@ -1013,7 +1031,8 @@ class EpadFindbox(Box):
 
     def repl_pressed(self, obj):
         ''' find-and-replace activated '''
-        tmp_text = markup_to_utf8(self._parent.tabbs.current.main_en.entry_get())
+        tmp_text = markup_to_utf8(self._parent.tabbs.current.
+                                  main_en.entry_get())
         if not self.case_chk.state_get():
             search_string = self.find_entry.text.lower()
             locations = list(self.find_all(tmp_text.lower(), search_string))
@@ -1023,13 +1042,14 @@ class EpadFindbox(Box):
         search_length = len(search_string)
         if search_length:
             replace_string = self.repl_entry.text
-            #if replace_string:
+            # if replace_string:
             if locations:
                 if not self._parent.config['case_sensitive']:
                     our_re = re.compile(search_string, re.IGNORECASE)
                 else:
                     our_re = re.compile(search_string)
-                tmp_text = our_re.sub(replace_string, tmp_text).encode('utf-8').strip()
+                tmp_text = our_re.sub(replace_string,
+                                      tmp_text).encode('utf-8').strip()
                 tmp_text = utf8_to_markup(tmp_text)
                 cur_pos = self._parent.tabbs.current.main_en.cursor_pos_get()
                 self._parent.tabbs.current.main_en.text_set(tmp_text)
@@ -1037,14 +1057,15 @@ class EpadFindbox(Box):
                     self._parent.tabbs.current.main_en.cursor_pos_set(cur_pos)
                 except SystemError:
                     pass
-                    #print("Error: Can't set cursor position")
+                    # print("Error: Can't set cursor position")
                 self._parent.tabbs.current.txt_editd()
                 self._parent.tabbs.current.take_snapshot()
             else:
                 error_popup(self._parent.main_wndw, "Text %s not found.\
-                            Nothing replaced."%search_string)
-            #else:
-            #    error_popup(self._parent.main_wndw, "No replacement string entered.")
+                            Nothing replaced." % search_string)
+            # else:
+            #     error_popup(self._parent.main_wndw,
+            #                 "No replacement string entered.")
         else:
             error_popup(self._parent.main_wndw, "No find string entered.")
 
@@ -1052,15 +1073,18 @@ class EpadFindbox(Box):
         ''' search for next instance '''
         if not self.case_chk.state_get():
             search_string = self.find_entry.text.lower()
-            tmp_text = markup_to_utf8(self._parent.tabbs.current.main_en.entry_get()).lower()
+            tmp_text = markup_to_utf8(self._parent.tabbs.
+                                      current.main_en.entry_get()).lower()
         else:
             search_string = self.find_entry.text
-            tmp_text = markup_to_utf8(self._parent.tabbs.current.main_en.entry_get())
+            tmp_text = markup_to_utf8(self._parent.tabbs.
+                                      current.main_en.entry_get())
         search_length = len(search_string)
         if search_length:
             locations = list(self.find_all(tmp_text, search_string))
             if locations:
-                if (self.curr_find is None) or (search_string != self.last_srch):
+                if (self.curr_find is None) or (search_string
+                                                != self.last_srch):
                     self.last_srch = search_string
                     self.curr_find = locations[0]
                 else:
@@ -1069,10 +1093,13 @@ class EpadFindbox(Box):
                         self.curr_find = locations[last_find+1]
                     else:
                         self.curr_find = locations[0]
-                self._parent.tabbs.current.main_en.select_region_set(self.curr_find,
-                                                                     self.curr_find+search_length)
+                self._parent.tabbs.\
+                current.main_en.select_region_set(self.curr_find,
+                                                  self.curr_find +
+                                                  search_length)
             else:
-                error_popup(self._parent.main_wndw, "Text %s not found."%search_string)
+                error_popup(self._parent.main_wndw,
+                            "Text %s not found." % search_string)
         else:
             error_popup(self._parent.main_wndw, "No find string entered.")
 
@@ -1113,8 +1140,8 @@ class EpadToolbar(Toolbar):
         self.item_append("document-open", "Open",
                          lambda self, obj: self._parent.open_file())
         self.savebtn = self.item_append("document-save", "Save",
-                                        lambda self,
-                                               obj: self._parent.save_file())
+                                        lambda self, obj:
+                                        self._parent.save_file())
         self.savebtn.disabled = True
         self.item_append("document-save-as", "Save As",
                          lambda self, obj: self._parent.save_as())
@@ -1146,7 +1173,8 @@ class EpadToolbar(Toolbar):
         _it = menu.item_add(None, "Wordwrap", None, self.optns_toggle)
         chk = Check(canvas)
         _it.content = chk
-        _it.content.state = (self._parent.config['word_wrap'] == ELM_WRAP_MIXED)
+        _it.content.state = (self._parent.config['word_wrap'] ==
+                             ELM_WRAP_MIXED)
         self.menu_item_ww = _it
 
         _it = menu.item_add(None, "Line Numbers", None, self.optns_toggle)
@@ -1154,7 +1182,6 @@ class EpadToolbar(Toolbar):
         _it.content = chk
         _it.content.state = self._parent.config['line_numbers']
         self.menu_item_ln = _it
-
 
         '''_it = menu.item_add(None, "New Instance", None, self.options_new)
         chk = Check(canvas, disabled=True)
@@ -1172,9 +1199,10 @@ class EpadToolbar(Toolbar):
     def shw_about(self, obj):
         ''' display version information '''
         try:
-            AboutWindow(self, title="ePad", standardicon="accessories-text-editor", \
-                        version=__version__, authors=AUTHORS, \
-                        licen=LICENSE, webaddress=__github__, \
+            AboutWindow(self, title="ePad",
+                        standardicon="accessories-text-editor",
+                        version=__version__, authors=AUTHORS,
+                        licen=LICENSE, webaddress=__github__,
                         info=INFO)
         except InstanceError:
             pass
@@ -1211,7 +1239,8 @@ class EpadToolbar(Toolbar):
             # for some reason have to reset font style
             while tab.main_en.text_style_user_peek():
                 tab.main_en.text_style_user_pop()
-            tab.main_en.text_style_user_push(self._parent.tabbs.current.font_style)
+            tab.main_en.text_style_user_push(self._parent.
+                                             tabbs.current.font_style)
         # Change line number state of all open tabs
         if linenum:
             for tab in self._parent.tabbs.tabs:
@@ -1274,6 +1303,7 @@ class EpadToolbar(Toolbar):
         self._parent.newInstance = not self._parent.newInstance
         _it.content.state = self._parent.newInstance
         reset_closemenu_count(None)
+
 
 class EpadConf(object):
     """
@@ -1361,7 +1391,9 @@ class EpadConf(object):
     def write(self):
         ''' write config file '''
         with open(self.path, "w") as config_file:
-            json.dump(self.data, config_file, sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(self.data, config_file,
+                      sort_keys=True, indent=4,
+                      separators=(',', ': '))
 
     # pylint: disable=attribute-defined-outside-init
     def default_config(self):
@@ -1421,12 +1453,13 @@ class EpadConf(object):
             self.__safe_set(setting, value)
         self.write()
 
+
 # pylint: disable=no-member
 if __name__ == "__main__":
 
     OUR_FILES = sys.argv
 
-    #Remove ePad.py from the arguments
+    # Remove ePad.py from the arguments
     del OUR_FILES[0]
 
     # Start App

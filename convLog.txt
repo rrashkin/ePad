@@ -233,5 +233,13 @@ is absolutely necessary to even execute.
  -- no yapf errors
 
 ------------------------------------------------------------------flake8
-epad:2:1: E265 block comment should start with '# '. This is the "#!/usr/bin/python" line and I don't want to mess with that.
+epad:2:1: E265 block comment should start with '# '. 
 various "line too long"s
+		and it may be screwing around with PYLINT!!
+   and space around operators
+   and space after #
+Calling it on FLAKE8 with the following errors remaining:
+epad:2:1: E265 block comment should start with '# '
+   This is the "#!/usr/bin/python" line and I don't want to mess with that.
+epad:1097:17: E122 continuation line missing indentation or outdented
+   I can't get this to anything acceptable to FLAKE8
